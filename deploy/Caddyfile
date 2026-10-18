@@ -1,0 +1,35 @@
+{
+	email {$ACME_EMAIL}
+}
+
+{$XS_PUBLIC_HOST} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=63072000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	request_body /api/* {
+		max_size 100MB
+	}
+
+	handle /api/* {
+		reverse_proxy api:8000
+	}
+
+	# La app (un solo HTML). Siempre se pide fresca para que tome la versión nueva.
+	handle {
+		root * /srv/app
+		header Cache-Control "no-cache"
+		try_files {path} /index.html
+		file_server
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

@@ -1,0 +1,54 @@
+# XSCRIPT en producción: Caddy (HTTPS + la app) → API (FastAPI + SQLite en /data).
+# Uso en el servidor:  ./deploy/deploy.sh
+# Variables en .env (copia .env.example; nunca lo subas al repo).
+
+services:
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      XS_PUBLIC_HOST: ${XS_PUBLIC_HOST:?Falta XS_PUBLIC_HOST en .env}
+      ACME_EMAIL: ${ACME_EMAIL:?Falta ACME_EMAIL en .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./deploy/app:/srv/app:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+
+  api:
+    build: ./server
+    restart: unless-stopped
+    environment:
+      XS_ENV: prod
+      XS_PUBLIC_HOST: ${XS_PUBLIC_HOST}
+      XS_DATA_DIR: /data
+      XS_OWNER_EMAILS: ${XS_OWNER_EMAILS:?Falta XS_OWNER_EMAILS en .env}
+      XS_GOOGLE_CLIENT_ID: ${XS_GOOGLE_CLIENT_ID:-}
+      XS_GOOGLE_CLIENT_SECRET: ${XS_GOOGLE_CLIENT_SECRET:-}
+      XS_S3_BUCKET: ${XS_S3_BUCKET:-}
+      XS_S3_HOST: ${XS_S3_HOST:-}
+      XS_S3_REGION: ${XS_S3_REGION:-}
+      XS_S3_ACCESS_KEY: ${XS_S3_ACCESS_KEY:-}
+      XS_S3_SECRET_KEY: ${XS_S3_SECRET_KEY:-}
+    volumes:
+      - xsdata:/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 700m
+    # Sin puertos publicados: solo Caddy le habla.
+
+volumes:
+  xsdata:
+  caddy_data:
+  caddy_config:
