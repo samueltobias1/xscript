@@ -1052,7 +1052,7 @@ html.xs-child.xs-ro .card{pointer-events:none}
     </div>
   </div>
   <div id="mainmenu" hidden role="menu">
-    <div class="mh">Pizarrón · XSCRIPT 4.9</div>
+    <div class="mh">Pizarrón · XSCRIPT 5.0</div>
     <button data-act="sumexp" role="menuitem"><b>Exportar para resumir</b><small>Baja el texto de las escenas para que Claude escriba títulos y resúmenes</small></button>
     <button data-act="sumimp" role="menuitem"><b>Importar resúmenes</b><small>Pone en las tarjetas los títulos y resúmenes que te regrese Claude</small></button>
     <button data-act="close" role="menuitem"><b>Ir al inicio</b><small>Lo guarda y vuelve a los proyectos recientes</small></button>
@@ -5851,7 +5851,7 @@ function drawPay(keep){
   const show=!!P.payOn&&view!=='arcs';st.hidden=!show;if(!show){closePayPop();$('#paycfg').hidden=true;return}
   const S=payS();st.style.height=payH()+'px';st.classList.toggle('full',!!S.full);
   const W=svg.clientWidth||1000,H=svg.clientHeight||104,base=H-3,sp=startPct(),tot=totalPages();
-  const cx=id=>{const s=byId(id);return s&&s.on?(sp[id]+s.pages/tot*50)/100*W:null};
+  const cx=id=>{const s=byId(id),r=s&&s.on&&tkR(s);return r?(r.a+r.b)/2/100*W:null};
   const list=(P.pay||[]).map(x=>({x,x1:cx(x.a),x2:cx(x.b)})).filter(o=>o.x1!=null&&o.x2!=null).sort((p,q)=>(q.x2-q.x1)-(p.x2-p.x1));
   $('#paycount').textContent=list.length?list.length+(list.length===1?' conexión':' conexiones'):'';
   let h=`<line x1="0" x2="${W}" y1="${base}" y2="${base}" stroke="var(--line)"/>`;
@@ -8383,6 +8383,33 @@ function zeroFix(){
   setOff(LS.get('xs49-off')==='1');
   h.onclick=()=>{closeAll();setOff(!tools.classList.contains('off'))};
  }}
+
+/* ================= 5.0 · el timeline sigue la POSICIÓN de las tarjetas en el pizarrón (no las páginas) ================= */
+function tkExt(){
+  if(!P||!P.views||!V())return null;const v=V();let lo=1e18,hi=-1e18,n=0;
+  P.scenes.forEach(s=>{if(!s.on)return;const p=v.pos[s.id];if(!p)return;lo=Math.min(lo,p.x);hi=Math.max(hi,p.x+cardW(s));n++});
+  if(!n)return null;return{lo,span:Math.max(hi-lo,1)}}
+function tkR(s){const E=tkExt(),p=E&&V().pos[s.id];if(!p)return null;
+  return{a:(p.x-E.lo)/E.span*100,b:(p.x+cardW(s)-E.lo)/E.span*100}}
+drawTrack=function(){
+  setTimeout(()=>{try{XSX.trk&&XSX.trk()}catch(_){}},0);drawPay();drawTrackHitos();
+  const tr=$('#trseg');if(!tr||!P)return;const on=filtOn();
+  tr.innerHTML=P.scenes.filter(s=>s.on).map(s=>{const r=tkR(s);if(!r)return'';const b=beatOf(s),m=!on||matches(s);
+    return`<div class="sg${m?' on':''}${selC.has(s.id)?' sel':''}" data-id="${s.id}" title="${esc('Esc. '+s.num+' · '+(s.title||s.head)+' · '+b.n)}" style="left:${r.a.toFixed(3)}%;width:${Math.max(r.b-r.a,.25).toFixed(3)}%;--c:${b.c}"></div>`}).join('')};
+drawTrackHitos=function(){
+  const el=$('#trht');if(!el||!P)return;
+  el.innerHTML=(P.hitos||[]).map(h=>{const s=byId(h.s);const r=s&&s.on&&tkR(s);if(!r)return'';const a=arcOf(h);
+    return`<i class="th" style="left:${((r.a+r.b)/2).toFixed(2)}%;--c:${a?a.c:'var(--faint)'}"></i>`}).join('')};
+updateRwin=function(){
+  const w=$('#rwin');if(!w)return;if(!P||view==='arcs'){w.hidden=true;return}
+  const E=tkExt();if(!E){w.hidden=true;return}
+  const t=T(),x0=-t.x/t.z,x1=(board.clientWidth-t.x)/t.z;
+  let a=(x0-E.lo)/E.span*100,b=(x1-E.lo)/E.span*100;
+  const wd=Math.max(Math.min(b-a,100),.8);a=Math.max(0,Math.min(a,100-wd));
+  w.hidden=false;w.style.left=a+'%';w.style.width=wd+'%'};
+scrubTo=function(p){
+  const E=tkExt();if(!E)return;const cx=E.lo+Math.max(0,Math.min(100,p))/100*E.span;
+  const t=T();t.x=board.clientWidth/2-cx*t.z;applyT()};
 
 /* ================= arranque ================= */
 XSX.boot();
