@@ -772,16 +772,9 @@ body.cmp-only .card.df-same{opacity:.2;filter:grayscale(.7)}
 #vtCmpM{padding:6px 8px;margin-left:-4px}
 #vtabs .vtr{display:flex;gap:2px;align-items:center}
 .vt.dropat{box-shadow:inset 3px 0 0 var(--accent)}
-#xsmid.split #app{top:46%}
-#cmpw{position:absolute;left:0;right:0;top:0;height:46%;z-index:5;border-bottom:3px solid var(--accent);background:var(--bg)}
-#cmpw iframe{position:absolute;inset:30px 0 0 0;width:100%;height:calc(100% - 30px);border:0;background:var(--bg)}
-#cmpw .cmpt{position:absolute;left:0;right:0;top:0;height:30px;display:flex;align-items:center;gap:10px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--line);font-size:12.5px;color:var(--mute)}
-#cmpw .cmpt b{color:var(--fg)}#cmpw .cmpt .btn{margin-left:auto;padding:2px 8px;height:22px;border:0;background:none}
 .sumch{display:flex;flex-direction:column;gap:8px}
 .sumch button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel2)}
 .sumch button:hover{border-color:var(--accent)}.sumch small{color:var(--mute)}
-html.xs-child #xbar,html.xs-child #vtabs,html.xs-child #app>.top,html.xs-child #tools,html.xs-child #selbar,html.xs-child #stkbar,html.xs-child #objbar,html.xs-child #home,html.xs-child #welcome,html.xs-child #xpz{display:none!important}
-html.xs-child .card{pointer-events:none}
 html.xs-child #hint{display:none!important}
 #vtabs .vt,#vtabs .vtr{flex:none}
 #vtCmp{max-width:150px;overflow:hidden;text-overflow:ellipsis}
@@ -954,6 +947,29 @@ body.xs-locked.xs-ro::after{display:none}
 #zpop .zrow{display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer}
 #zpop .zrow small{margin-left:auto;color:var(--faint);font-size:11px}
 #zpop button.btn{margin-top:10px;width:100%}
+#xsmid{--sp:46%}
+#xsmid.split #app{top:var(--sp)}
+#xsmid.split.sv #app{top:0;left:var(--sp)}
+#cmpw{position:absolute;left:0;right:0;top:0;height:var(--sp);z-index:5;background:var(--bg)}
+#xsmid.sv #cmpw{right:auto;bottom:0;height:auto;width:var(--sp)}
+#cmpd{position:absolute;z-index:8;left:0;right:0;top:calc(var(--sp) - 4px);height:8px;cursor:row-resize;background:var(--accent);opacity:.55;transition:opacity .12s}
+#xsmid.sv #cmpd{top:0;bottom:0;left:calc(var(--sp) - 4px);right:auto;width:8px;height:auto;cursor:col-resize}
+#cmpd:hover,#xsmid.dragging #cmpd{opacity:1}
+#xsmid.dragging{user-select:none}
+#cmpw iframe{position:absolute;inset:30px 0 0 0;width:100%;height:calc(100% - 30px);border:0;background:var(--bg)}
+#cmpw .cmpt{position:absolute;left:0;right:0;top:0;height:30px;display:flex;align-items:center;gap:6px;padding:0 10px;background:var(--panel);border-bottom:1px solid var(--line);font-size:12.5px;color:var(--mute)}
+#cmpw .cmpt b{color:var(--fg)}
+#cmpw .cmpt .btn{padding:2px 8px;height:22px;border:0;background:none}
+#cmpw .cmpt span{margin-right:auto}
+#cmpw .cmpv{padding:2px 8px;height:22px;border-radius:7px;border:1px solid var(--line);background:var(--panel2);color:var(--fg);font-size:12.5px}
+#cmpl{position:absolute;z-index:6;left:76px;bottom:12px;display:flex;gap:6px;align-items:center;padding:4px 10px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);font-size:12.5px;box-shadow:0 2px 10px #0006}
+#cmpl small{color:var(--mute)}
+html.xs-child #xbar,html.xs-child #vtabs,html.xs-child #app>.top,html.xs-child #home,html.xs-child #welcome,html.xs-child #xpz{display:none!important}
+html.xs-child.xs-ro #tools,html.xs-child.xs-ro #selbar,html.xs-child.xs-ro #stkbar,html.xs-child.xs-ro #objbar{display:none!important}
+html.xs-child.xs-ro .card{pointer-events:none}
+#cmpl.sv{left:calc(var(--sp) + 76px)}
+#tools{max-height:calc(100% - 20px);overflow-y:auto;scrollbar-width:none}#tools::-webkit-scrollbar{display:none}
+#tools>*{flex:none}
 </style>
 </head>
 <body>
@@ -994,7 +1010,7 @@ body.xs-locked.xs-ro::after{display:none}
     </div>
   </div>
   <div id="mainmenu" hidden role="menu">
-    <div class="mh">Pizarrón · XSCRIPT 4.5</div>
+    <div class="mh">Pizarrón · XSCRIPT 4.6</div>
     <button data-act="sumexp" role="menuitem"><b>Exportar para resumir</b><small>Baja el texto de las escenas para que Claude escriba títulos y resúmenes</small></button>
     <button data-act="sumimp" role="menuitem"><b>Importar resúmenes</b><small>Pone en las tarjetas los títulos y resúmenes que te regrese Claude</small></button>
     <button data-act="close" role="menuitem"><b>Ir al inicio</b><small>Lo guarda y vuelve a los proyectos recientes</small></button>
@@ -6811,24 +6827,6 @@ XSX.cmpMenu=anchor=>{
     const a=$('#vtCmpM');if(a&&x!=='list')setTimeout(()=>XSX.cmpMenu(a),0)},{right:true})};
 
 /* ---------- dos pizarrones: la versión anterior arriba, solo lectura ---------- */
-function cmpSplit(){
-  const mid=$('#xsmid');if(!mid||CHILD)return;
-  const c=curV?cmpOf(curV):null,want=!!(c&&c.on&&c.split&&mode==='piz'&&verById(c.base));
-  let w=$('#cmpw');
-  if(!want){if(w){w.remove();mid.classList.remove('split');setTimeout(()=>dispatchEvent(new Event('resize')),30)}return}
-  const A=verById(c.base);
-  if(w&&w.dataset.v===A.id){mid.classList.add('split');return}
-  if(w)w.remove();
-  w=document.createElement('div');w.id='cmpw';w.dataset.v=A.id;
-  w.innerHTML='<div class="cmpt"><b>'+esc(A.label)+'</b><span>versión anterior · solo lectura</span><button class="btn" id="cmpx" title="Cerrar este pizarrón">✕</button></div><iframe name="xs-cmp" title="Versión anterior"></iframe>';
-  mid.appendChild(w);mid.classList.add('split');
-  const fr=w.querySelector('iframe');
-  const onmsg=e=>{if(e.source!==fr.contentWindow||!e.data||e.data.xs!=='cmp'||e.data.t!=='ready')return;removeEventListener('message',onmsg);
-    const P2=JSON.parse(JSON.stringify(A.P));fr.contentWindow.postMessage({xs:'cmp',t:'load',P:P2,theme:PR.theme},'*')};
-  addEventListener('message',onmsg);
-  fr.srcdoc=XS_SRC;
-  w.querySelector('#cmpx').onclick=()=>{c.split=false;cmpRefresh()};
-  setTimeout(()=>dispatchEvent(new Event('resize')),30)}
 /* al tocar una tarjeta, el pizarrón de arriba salta a la escena equivalente */
 document.addEventListener('pointerup',e=>{
   if(CHILD||!DIFF)return;const w=$('#cmpw');if(!w)return;
@@ -6837,14 +6835,24 @@ document.addEventListener('pointerup',e=>{
   try{w.querySelector('iframe').contentWindow.postMessage({xs:'cmp',t:'focus',id:d.a.id},'*')}catch(_){}},true);
 
 /* ---------- el pizarrón hijo (solo lectura) ---------- */
+let CMPLAST='';
+function cmpSend(){
+  if(!CHILD||closed||!P)return;
+  const s=serializeP(P),k=s.replace(/"saved":"[^"]*"/,'');if(k===CMPLAST)return;CMPLAST=k;
+  try{parent.postMessage({xs:'cmp',t:'save',P:s},'*')}catch(_){}}
 if(CHILD){
-  document.documentElement.classList.add('xs-child');
+  document.documentElement.classList.add('xs-child');XSX.save=cmpSend;
   XSX.home=()=>{};XSX.homeHide=()=>{};
   XSX.boot=async()=>{
     PR.theme='dark';applyTheme();
     addEventListener('message',e=>{
       const m=e.data;if(!m||m.xs!=='cmp')return;
-      if(m.t==='load'){if(m.theme){PR.theme=m.theme;applyTheme()}setProject(m.P);closed=true;document.querySelectorAll('.card').forEach(c=>c.removeAttribute('draggable'))}
+      if(m.t==='load'){if(m.theme){PR.theme=m.theme;applyTheme()}setProject(m.P);if(m.view&&m.view!==view){try{setView(m.view)}catch(_){}}
+        closed=!!m.ro;document.documentElement.classList.toggle('xs-ro',!!m.ro);
+        if(m.ro)document.querySelectorAll('.card').forEach(c=>c.removeAttribute('draggable'));
+        CMPLAST=serializeP(P).replace(/"saved":"[^"]*"/,'')}
+      else if(m.t==='view'){try{setView(m.v)}catch(_){}}
+      else if(m.t==='flush'){cmpSend()}
       else if(m.t==='focus'){try{setSel([m.id],[]);focusCard(m.id)}catch(_){}}});
     parent.postMessage({xs:'cmp',t:'ready'},'*')}}
 else{
@@ -7271,7 +7279,7 @@ const _hh5=XSX.homeHide;XSX.homeHide=()=>{document.body.classList.remove('xs-hom
 /* Si la app se abre desde su servidor (xscript.detonantevfx.com) funciona en la nube.
    Si se abre como archivo o desde otro lado, sigue en modo archivo (.json) como la 3.2. */
 const CL={mode:'?',user:null,pid:null,role:null,rev:0,canEdit:false,lock:null,dirty:false,saving:false,offline:false,pdfs:{},pdfUp:new Set(),err:null};
-const DEV=(()=>{try{let d=localStorage.getItem('xscript:device');if(!d){d=uid()+uid();localStorage.setItem('xscript:device',d)}return d}catch(_){return 'd'+uid()}})();
+const DEV=(()=>{try{let d=sessionStorage.getItem('xscript:win');if(!d){d=uid()+uid();sessionStorage.setItem('xscript:win',d)}return d}catch(_){return 'd'+uid()}})();
 const API=(p,o={})=>fetch(p,Object.assign({credentials:'same-origin'},o,{headers:Object.assign({'x-xs':'1'},o.headers||{})}));
 const CLOUDP=(async()=>{
   if(CHILD||!/^https?:$/.test(location.protocol)){CL.mode='local';return}
@@ -7375,7 +7383,7 @@ async function heartbeat(){
     CL.offline=false}catch(_){CL.offline=true}
   paintFile()}
 function startTurn(){clearInterval(hbT);clearInterval(pollT);hbT=setInterval(heartbeat,30000)}
-function startWatch(){clearInterval(hbT);clearInterval(pollT);pollT=setInterval(watchMeta,20000)}
+function startWatch(){clearInterval(hbT);clearInterval(pollT);pollT=setInterval(watchMeta,5000)}
 async function watchMeta(){
   if(!CL.pid||CL.canEdit)return;
   try{const r=await fetch(`/api/projects/${CL.pid}/meta`,{credentials:'same-origin'});if(!r.ok)return;const m=await r.json();
@@ -7440,7 +7448,7 @@ async function openCloud(pid,keepTurn){
     if(CL.role==='view'){CL.canEdit=false;startWatch()}
     else{const r=await API(`/api/projects/${pid}/lock?device=${DEV}`,{method:'POST'});const j=await r.json().catch(()=>({}));
       if(r.ok&&j.ok){CL.canEdit=true;CL.lock=null;startTurn()}else{CL.canEdit=false;CL.lock=j.lock||null;startWatch();
-        toast((CL.lock&&CL.lock.name||'Otra persona')+' está editando este proyecto. Lo ves en lectura; arriba puedes pedir el turno.',5500)}}
+        toast(CL.lock&&CL.user&&CL.lock.email===CL.user.email?'Este proyecto está abierto para editar en otra ventana tuya. Aquí lo ves en lectura y se actualiza solo; arriba puedes tomar el turno.':(CL.lock&&CL.lock.name||'Otra persona')+' está editando este proyecto. Lo ves en lectura; arriba puedes pedir el turno.',6500)}}
     paintFile();
   }catch(e){console.error(e);toast('No pude abrir el proyecto: '+(e.message||e),5000);history.replaceState(null,'','/')}
   finally{busy(false)}}
@@ -8069,6 +8077,67 @@ zp.addEventListener('click',e=>{if(e.target.closest('[data-zall]')){const h=hidO
  document.addEventListener('pointerdown',e=>{if(!zp.hidden&&!e.target.closest('#zpop,#zbtn,#sure'))zp.hidden=true},true)}
 XSX.setHid=setHid;
 }
+
+/* ================= 4.6 · pizarrones lado a lado (estilo Blender), editables ================= */
+function cmpResize(){setTimeout(()=>dispatchEvent(new Event('resize')),30)}
+function cmpFlush(cb){const w=$('#cmpw');if(!w){cb();return}try{w.querySelector('iframe').contentWindow.postMessage({xs:'cmp',t:'flush'},'*')}catch(_){}setTimeout(cb,160)}
+const cmpEditable=A=>!!(A&&!A.locked&&(!cloud()||CL.canEdit));
+function cmpSplit(){
+  const mid=$('#xsmid');if(!mid||CHILD)return;
+  const c=curV?cmpOf(curV):null,want=!!(c&&c.on&&c.split&&mode==='piz'&&verById(c.base));
+  let w=$('#cmpw'),d=$('#cmpd');
+  if(!want){if(w)w.remove();if(d)d.remove();const l=$('#cmpl');if(l)l.remove();
+    if(mid.classList.contains('split')){mid.classList.remove('split','sv');mid.style.removeProperty('--sp');cmpResize()}return}
+  const A=verById(c.base),vert=c.dir==='v';
+  mid.classList.add('split');mid.classList.toggle('sv',vert);mid.style.setProperty('--sp',(c.pct||(vert?50:46))+'%');
+  if(!d){d=document.createElement('div');d.id='cmpd';d.title='Arrastra para cambiar el tamaño';mid.appendChild(d);
+    d.addEventListener('pointerdown',e=>{e.preventDefault();d.setPointerCapture(e.pointerId);d.dataset.on='1';mid.classList.add('dragging')});
+    d.addEventListener('pointermove',e=>{if(d.dataset.on!=='1')return;const r=mid.getBoundingClientRect(),cc=cmpOf(curV),v=cc.dir==='v';
+      let p=v?(e.clientX-r.left)/r.width:(e.clientY-r.top)/r.height;p=Math.max(.15,Math.min(.85,p))*100;cc.pct=p;mid.style.setProperty('--sp',p+'%');
+      if(!d._t){d._t=setTimeout(()=>{d._t=0;dispatchEvent(new Event('resize'))},60)}});
+    const up=()=>{if(d.dataset.on!=='1')return;d.dataset.on='';mid.classList.remove('dragging');cmpResize()};
+    d.addEventListener('pointerup',up);d.addEventListener('pointercancel',up);
+    d.addEventListener('dblclick',()=>{const cc=cmpOf(curV);cc.pct=cc.dir==='v'?50:46;mid.style.setProperty('--sp',cc.pct+'%');cmpResize()})}
+  /* etiqueta de la versión actual (la del pizarrón principal) */
+  let l=$('#cmpl');if(!l){l=document.createElement('button');l.id='cmpl';mid.appendChild(l);
+    l.onclick=()=>{const html=XP.vers.filter(v=>v.id!==cmpOf(curV).base).map(v=>`<button data-x="${v.id}">${v.id===curV.id?'● ':'○ '}${esc(v.label)}</button>`).join('');
+      xmenu(l,html,id=>{const v=verById(id);if(v&&v!==curV)cmpFlush(()=>activate(v))})}}
+  l.innerHTML='<b>'+esc(curV.label)+'</b> ▾ <small>'+(cmpEditable(curV)?'actual · editable':'solo lectura')+'</small>';
+  l.classList.toggle('sv',vert);
+  if(w&&w.dataset.v===A.id){cmpHdr(w,A,c);return}
+  if(w)w.remove();
+  w=document.createElement('div');w.id='cmpw';w.dataset.v=A.id;
+  w.innerHTML='<div class="cmpt"></div><iframe name="xs-cmp" title="Otra versión"></iframe>';
+  mid.insertBefore(w,d);cmpHdr(w,A,c);
+  const fr=w.querySelector('iframe'),ro=!cmpEditable(A);
+  const onmsg=e=>{if(e.source!==fr.contentWindow||!e.data||e.data.xs!=='cmp'||e.data.t!=='ready')return;removeEventListener('message',onmsg);
+    const P2=JSON.parse(JSON.stringify(A.P));fr.contentWindow.postMessage({xs:'cmp',t:'load',P:P2,theme:PR.theme,view:view,ro:ro},'*')};
+  addEventListener('message',onmsg);
+  fr.srcdoc=XS_SRC;cmpResize()}
+function cmpHdr(w,A,c){
+  const t=w.querySelector('.cmpt'),ro=!cmpEditable(A);
+  t.innerHTML='<button class="cmpv" id="cmpv" title="Cambiar la versión de este pizarrón"><b>'+esc(A.label)+'</b> ▾</button><span>'+(ro?'solo lectura':'editable')+'</span>'
+   +'<button class="btn" id="cmpsw" title="Intercambiar: esta versión pasa al pizarrón principal">⇄</button>'
+   +'<button class="btn" id="cmpdir" title="Cambiar entre arriba/abajo y lado a lado">'+(c.dir==='v'?'⬓':'◫')+'</button>'
+   +'<button class="btn" id="cmpx" title="Cerrar este pizarrón">✕</button>';
+  t.querySelector('#cmpv').onclick=ev=>{
+    const html=XP.vers.filter(v=>v.id!==curV.id).map(v=>`<button data-x="${v.id}">${v.id===A.id?'● ':'○ '}${esc(v.label)}<small>${esc((v.pdfName||'').replace(/\.pdf$/i,''))}</small></button>`).join('');
+    xmenu(ev.currentTarget,html,id=>{cmpFlush(()=>{c.base=id;cmpRefresh()})})};
+  t.querySelector('#cmpx').onclick=()=>cmpFlush(()=>{c.split=false;cmpRefresh()});
+  t.querySelector('#cmpdir').onclick=()=>{c.dir=c.dir==='v'?'h':'v';c.pct=c.dir==='v'?50:46;cmpSplit();cmpResize()};
+  t.querySelector('#cmpsw').onclick=()=>cmpFlush(()=>{
+    const old=curV,n=cmpOf(A);Object.assign(n,{on:true,split:true,base:old.id,only:false,dir:c.dir,pct:c.pct?100-c.pct:null});c.split=false;activate(A)})}
+/* el pizarrón de al lado guarda lo que editas aquí */
+let cmpEdT=0;
+addEventListener('message',e=>{
+  const m=e.data;if(CHILD||!m||m.xs!=='cmp'||m.t!=='save')return;
+  const w=$('#cmpw');if(!w||e.source!==w.querySelector('iframe').contentWindow)return;
+  const A=verById(w.dataset.v);if(!A||!cmpEditable(A))return;
+  try{A.P=finishProject(JSON.parse(m.P))}catch(err){console.error(err);return}
+  dirty.add(A.id);schedFlush();try{markDirty()}catch(_){}
+  clearTimeout(cmpEdT);cmpEdT=setTimeout(()=>{try{calcDiff();P.scenes.forEach(s=>{try{paintCard(s)}catch(_){}});drawTrack()}catch(_){}},400)});
+/* el pizarrón de al lado sigue la misma vista (Pizarrón, Save the Cat…) */
+{const _sv=setView;setView=function(v){_sv(v);try{const w=$('#cmpw');if(w)w.querySelector('iframe').contentWindow.postMessage({xs:'cmp',t:'view',v:v},'*')}catch(_){}}}
 
 /* ================= arranque ================= */
 XSX.boot();
