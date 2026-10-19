@@ -994,7 +994,7 @@ body.xs-locked.xs-ro::after{display:none}
     </div>
   </div>
   <div id="mainmenu" hidden role="menu">
-    <div class="mh">Pizarrón · XSCRIPT 4.4</div>
+    <div class="mh">Pizarrón · XSCRIPT 4.5</div>
     <button data-act="sumexp" role="menuitem"><b>Exportar para resumir</b><small>Baja el texto de las escenas para que Claude escriba títulos y resúmenes</small></button>
     <button data-act="sumimp" role="menuitem"><b>Importar resúmenes</b><small>Pone en las tarjetas los títulos y resúmenes que te regrese Claude</small></button>
     <button data-act="close" role="menuitem"><b>Ir al inicio</b><small>Lo guarda y vuelve a los proyectos recientes</small></button>
@@ -6598,7 +6598,10 @@ function copySelection(){
   CLIP={id:uid(),t:Date.now(),cards:ids.map(id=>{const s=byId(id);return s?{s:deepc(Object.assign({},s,{_hay:null})),p:v.pos[id]?Object.assign({},v.pos[id]):null}:null}).filter(Boolean),
     texts:ink.map(id=>v.texts.find(t=>t.id===id)).filter(Boolean).map(deepc),strokes:ink.map(id=>v.strokes.find(t=>t.id===id)).filter(Boolean).map(deepc),imgs:{}};
   CLIP.texts.forEach(t=>{if(t.img&&P.imgData&&P.imgData[t.img])CLIP.imgs[t.img]=P.imgData[t.img]});
+  try{localStorage.setItem('xs-clip',JSON.stringify(CLIP))}catch(_){
+    try{localStorage.setItem('xs-clip',JSON.stringify(Object.assign({},CLIP,{imgs:{}})));toast('Copiado (las imágenes grandes solo se pegan en esta ventana)',2600)}catch(__){try{localStorage.removeItem('xs-clip')}catch(___){}}}
   return true}
+function loadClip(){try{const j=localStorage.getItem('xs-clip');if(j){const c=JSON.parse(j);if(c&&c.cards&&c.texts){CLIP=c;return true}}}catch(_){}return false}
 let lastW=null;
 board.addEventListener('pointermove',e=>{lastW=toWorld(e.clientX,e.clientY)});
 function pasteClip(){
@@ -6627,7 +6630,7 @@ document.addEventListener('keydown',e=>{
   if(!inPiz()||isTyping(e))return;
   const mod=e.ctrlKey||e.metaKey,k=e.key.toLowerCase();
   if(mod&&k==='d'){e.preventDefault();dupSelection();return}
-  if(mod&&k==='c'){if(copySelection()){try{navigator.clipboard&&navigator.clipboard.writeText('XSCRIPT-CLIP:'+CLIP.id).catch(()=>{})}catch(_){}toast('Copiado: Ctrl+V pega aquí o en otra versión',1600)}}
+  if(mod&&k==='c'){if(copySelection()){try{navigator.clipboard&&navigator.clipboard.writeText('XSCRIPT-CLIP:'+CLIP.id).catch(()=>{})}catch(_){}toast('Copiado: Ctrl+V pega aquí, en otra versión o en otra ventana',1800)}}
 });
 document.addEventListener('copy',e=>{
   if(!inPiz()||isTyping(e)||!CLIP||Date.now()-CLIP.t>2500)return;
@@ -6667,7 +6670,7 @@ document.addEventListener('paste',e=>{
   const files=[...(cd.files||[])].filter(f=>/^image\//.test(f.type));
   if(files.length){e.preventDefault();addImageFiles(files);return}
   const txt=cd.getData('text/plain')||'';
-  if(CLIP&&txt.startsWith('XSCRIPT-CLIP:')){e.preventDefault();pasteClip()}});
+  if(txt.startsWith('XSCRIPT-CLIP:')){const id=txt.slice(13);if(!CLIP||CLIP.id!==id)loadClip();if(CLIP){e.preventDefault();pasteClip()}}});
 /* Ctrl+V sin permiso de portapapeles: el evento paste ya trae los datos; este respaldo cubre copias hechas dentro de XSCRIPT */
 board.addEventListener('dragover',e=>{if(e.dataTransfer&&[...e.dataTransfer.types].includes('Files')){e.preventDefault();if(!$('#drop-img')){const d=document.createElement('div');d.id='drop-img';d.textContent='Suelta la imagen aquí';board.appendChild(d)}}});
 ['dragleave','drop'].forEach(ev=>board.addEventListener(ev,e=>{if(ev==='drop'||e.target===board){const d=$('#drop-img');if(d)d.remove()}}));
