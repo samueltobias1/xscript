@@ -1,0 +1,5 @@
+/* ===== 4.3 proyecto en blanco ===== */
+#emptyb{position:absolute;left:50%;top:66%;transform:translate(-50%,-50%);max-width:420px;text-align:center;color:var(--mute);pointer-events:none;display:flex;flex-direction:column;gap:8px;z-index:2}
+#emptyb[hidden]{display:none}
+#emptyb b{font-size:20px;color:var(--fg)}
+#emptyb span{font-size:14px;line-height:1.5}

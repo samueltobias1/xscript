@@ -932,6 +932,11 @@ body.xs-locked.xs-ro::after{display:none}
 #stp .stg button:hover{border-color:var(--accent)}
 #stp .stg .tx{position:static;pointer-events:none;font-size:22px!important;transform:none}
 @media (max-width:700px){#gbar{left:8px;right:8px;transform:none;max-width:none;bottom:64px;max-height:38vh;overflow:auto}#stp{left:64px!important;width:min(330px,calc(100vw - 80px))}}
+/* ===== 4.3 proyecto en blanco ===== */
+#emptyb{position:absolute;left:50%;top:66%;transform:translate(-50%,-50%);max-width:420px;text-align:center;color:var(--mute);pointer-events:none;display:flex;flex-direction:column;gap:8px;z-index:2}
+#emptyb[hidden]{display:none}
+#emptyb b{font-size:20px;color:var(--fg)}
+#emptyb span{font-size:14px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -972,7 +977,7 @@ body.xs-locked.xs-ro::after{display:none}
     </div>
   </div>
   <div id="mainmenu" hidden role="menu">
-    <div class="mh">Pizarrón · XSCRIPT 4.2</div>
+    <div class="mh">Pizarrón · XSCRIPT 4.3</div>
     <button data-act="sumexp" role="menuitem"><b>Exportar para resumir</b><small>Baja el texto de las escenas para que Claude escriba títulos y resúmenes</small></button>
     <button data-act="sumimp" role="menuitem"><b>Importar resúmenes</b><small>Pone en las tarjetas los títulos y resúmenes que te regrese Claude</small></button>
     <button data-act="close" role="menuitem"><b>Ir al inicio</b><small>Lo guarda y vuelve a los proyectos recientes</small></button>
@@ -4659,7 +4664,7 @@ function refreshAll(keepAnim){
   $('#tools').hidden=arcs;$('#zoomui').hidden=arcs;
   board.className='t-'+tool;
   if(!arcs){placeCards();paintBeats();drawBg();drawInk();applyT()}else drawArcs();
-  applyFilters();setLinksBtn();hint();
+  applyFilters();setLinksBtn();hint();XSX.emptyHint&&XSX.emptyHint();
 }
 function hint(){
   const H={free:'Arrastra en vacío para seleccionar varias tarjetas. Doble clic abre la escena. Botón central, espacio o la mano mueven el lienzo. Arrastra ⇆ para recorrer una etapa y todo lo que sigue (Alt: solo la línea). Doble clic en un nombre lo edita.',
@@ -4681,7 +4686,7 @@ function fit(anim=true){
   const v=V();P.scenes.forEach(s=>{const p=v.pos[s.id],e=els[s.id];if(!p)return;x0=Math.min(x0,p.x);y0=Math.min(y0,p.y);x1=Math.max(x1,p.x+e.offsetWidth);y1=Math.max(y1,p.y+e.offsetHeight)});
   if(view!=='free'){const E=v.edges;if(E){x0=Math.min(x0,E[0]-20);x1=Math.max(x1,E[E.length-1]+20)}y0=0}else{y0=Math.min(y0,20);x1+=130}
   v.texts.forEach(t=>{x0=Math.min(x0,t.x);y0=Math.min(y0,t.y);x1=Math.max(x1,t.x+200);y1=Math.max(y1,t.y+40)});
-  if(x0>x1)return;const W=board.clientWidth-90,Hh=board.clientHeight-70,t=T();
+  if(y1<y0)y1=y0+520;if(x0>x1)return;const W=board.clientWidth-90,Hh=board.clientHeight-70,t=T();
   t.z=clamp(Math.min(W/(x1-x0),Hh/(y1-y0)),.08,1.2);t.x=70+(W-(x1-x0)*t.z)/2-x0*t.z;t.y=20-y0*t.z;
   if(anim){world.style.transition='transform .35s';setTimeout(()=>world.style.transition='',380)}applyT();
 }
@@ -5503,7 +5508,7 @@ function newScene(w){
   const v=V(),s0=snapState(),cw=SIZES[P.size];let idx=-1,best=-1e9;
   P.scenes.forEach((s,i)=>{const p=v.pos[s.id];if(!p)return;const c=p.x+cardW(s)/2;if(c<=w.x&&c>best){best=c;idx=i}});
   const n=Math.max(0,...P.scenes.filter(s=>s.nw).map(s=>parseInt(String(s.num).slice(1))||0))+1;
-  const sc={id:uid(),nw:1,num:'N'+n,head:'ESCENA NUEVA',title:'',note:'',first:'',chars:[],text:[],ptxt:'',doc:[{a:'l',h:''}],pages:0,on:true,w:null,stk:[],cm:[],page:null};
+  const sc={id:uid(),nw:1,num:'N'+n,head:'ESCENA NUEVA',title:'',note:'',first:'',chars:[],text:[],ptxt:'',doc:[{a:'l',h:''}],pages:P.blank?(P.defPg||2):0,on:true,w:null,stk:[],cm:[],page:null};
   nwText(sc);P.scenes.splice(idx+1,0,sc);buildCards();
   v.pos[sc.id]={x:Math.round(w.x-cw/2),y:Math.round(w.y-40)};
   ['free','stc','hero'].forEach(k=>{if(k!==view&&Object.keys(P.views[k].pos).length)autoLayout(k,true)});
@@ -7573,8 +7578,8 @@ XSX.home=async()=>{
     <button class="pm" data-pm="${p.id}" aria-label="Más opciones">⋯</button></div>`;
   el.innerHTML=`<div class="hw"><div class="hhead"><h1 class="slug"><span class="sn">1</span><span>INT. <em>XSCRIPT</em> - DÍA</span><span class="sn">1</span></h1><span class="sp"></span><span class="huser">${CL.user.picture?`<img src="${esc(CL.user.picture)}" alt="" referrerpolicy="no-referrer">`:''}${esc(CL.user.name)}</span></div>
   ${recov?`<div class="hnote"><span>Quedaron cambios sin subir de <b>${esc(w.name)}</b> (${sinceStr(w.at)}).</span><button class="btn" data-h="discard">Descartar</button><button class="btn pri" data-h="recover">Subirlos</button></div>`:''}
-  <div class="hb"><button class="btn pri" data-h="new">Nuevo proyecto (PDF del guion)</button><button class="btn" data-h="up">Subir un .json</button></div>
-  <h3>Mis proyectos</h3>${mine.length?`<div class="rlist">${mine.map(row).join('')}</div>`:'<div class="hempty">Aún no tienes proyectos. Crea uno con el PDF de tu guion, o sube el .json de un proyecto que ya tengas.</div>'}
+  <div class="hb"><button class="btn pri" data-h="new">Nuevo proyecto (PDF del guion)</button><button class="btn" data-h="blank">Proyecto en blanco</button><button class="btn" data-h="up">Subir un .json</button></div>
+  <h3>Mis proyectos</h3>${mine.length?`<div class="rlist">${mine.map(row).join('')}</div>`:'<div class="hempty">Aún no tienes proyectos. Crea uno con el PDF de tu guion, empieza uno en blanco, o sube el .json de un proyecto que ya tengas.</div>'}
   ${shared.length?`<h3>Compartidos conmigo</h3><div class="rlist">${shared.map(row).join('')}</div>`:''}
   ${trash.length?`<details class="hleg"><summary>Papelera (${trash.length})</summary><p>Los proyectos borrados se pueden recuperar durante 30 días.</p><div class="rlist">${trash.map(t=>`<div class="rrow lg"><b>${esc(t.name)}</b><span>borrado ${fdate2(t.deleted*1000)}</span><span class="sp"></span><button class="btn" data-rs="${t.id}">Recuperar</button></div>`).join('')}</div></details>`:''}
   </div>`;
@@ -7587,6 +7592,7 @@ $('#home').addEventListener('click',async e=>{
   if(a==='login'){location.href='/api/auth/login?next='+encodeURIComponent(location.pathname+location.search);return}
   if(a==='new'){pendingPdf='new';$('#xsPdf').click();return}
   if(a==='up'){$('#xsJson').click();return}
+  if(a==='blank'){XSX.blankProject();return}
   if(a==='recover'){recoverCloud();return}
   if(a==='discard'){askSure('Se tiran los cambios que no se subieron.','Descartar',async()=>{const w=await workInfo();if(w&&w.id)await dropProjDb(w.id);await dbDel('proj','__work');XSX.home()});return}
   if(h.dataset.rs){await API(`/api/projects/${h.dataset.rs}/restore`,{method:'POST'});XSX.home();return}
@@ -7958,6 +7964,31 @@ document.addEventListener('keydown',e=>{
   if(mod&&k==='g'){e.preventDefault();e.shiftKey?doUngroup():doGroup()}},true);
 textsEl.addEventListener('focusout',e=>{const el=e.target.closest&&e.target.closest('.tx');if(!el)return;setTimeout(()=>{const id=el.dataset.id;if(byId2(id)&&!selI.size&&!selC.size)setSel([],[id])},40)});
 window.__xs42={doGroup,doUngroup,oneGroup,bbox,sel,PRE,FONTS};
+}
+
+/* ================= XSCRIPT 4.3 · proyecto en blanco (sin guion) ================= */
+{
+async function blankCloud(nm,vl,pg){
+  const p=finishProject({app:'rayos-x',v:1,name:nm,blank:true,defPg:Math.round(pg*8),scenes:[],arcs:[],marks:[]});
+  const v=mkVer(p,'',1,null);v.label=vl;
+  const meta={id:uid(),name:nm,created:Date.now(),updated:Date.now(),cur:v.id,cfg:{},vers:[{id:v.id,label:vl,pdfName:'',added:v.added,hasPdf:false}]};
+  const id=await createCloud({app:'xscript',v:3,project:{meta,versions:[{meta:meta.vers[0],P:serializeP(p),rev:null,stats:null,pdf:null}]}},nm,{});
+  await openCloud(id)}
+XSX.blankProject=()=>{
+  xdlg({title:'Proyecto en blanco',sm:true,
+    html:`<label class="nfl">Nombre del proyecto<input type="text" id="bpName" autocomplete="off" placeholder="Mi película"></label>
+    <label class="nfl">Nombre de esta versión<input type="text" id="bpVer" autocomplete="off" placeholder="V1, Borrador…"></label>
+    <label class="nfl">Páginas que vale cada tarjeta nueva<input type="number" id="bpPg" min="0.25" max="10" step="0.25" value="1"></label>
+    <p style="margin:6px 0 0;color:var(--faint);font-size:12px;line-height:1.5">Empiezas sin guion: crea tarjetas con doble clic en el pizarrón o con «＋ Tarjeta». La duración de cada una (en páginas) se cambia dentro de la tarjeta y es la que arma el timeline y los porcentajes de Save the Cat.</p>`,
+    init:d=>{d.querySelector('#bpVer').value='V1';d.querySelectorAll('input').forEach(i=>i.onkeydown=e=>e.stopPropagation());setTimeout(()=>d.querySelector('#bpName').focus(),50)},
+    buttons:[{label:'Cancelar'},{label:'Crear',pri:true,fn:d=>{
+      const nm=d.querySelector('#bpName').value.trim()||'Proyecto en blanco',vl=d.querySelector('#bpVer').value.trim()||'V1',pg=Math.max(.25,Math.min(10,+d.querySelector('#bpPg').value||1));
+      (async()=>{busy(true);try{await blankCloud(nm,vl,pg);toast('Proyecto en blanco listo',2500)}catch(e){console.error(e);toast('No pude crear el proyecto: '+(e.message||e),5000)}finally{busy(false)}})()}}]})};
+/* mensaje cuando el pizarrón está vacío */
+const eb=document.createElement('div');eb.id='emptyb';eb.hidden=true;
+eb.innerHTML='<b>Pizarrón en blanco</b><span>Haz doble clic donde quieras una tarjeta, o usa «＋ Tarjeta». Las tarjetas se ordenan de izquierda a derecha y arman el timeline.</span>';
+board.appendChild(eb);
+XSX.emptyHint=()=>{try{eb.hidden=!(P&&P.scenes.length===0&&view!=='arcs'&&XSX.mode==='piz')}catch(_){eb.hidden=true}};
 }
 
 /* ================= arranque ================= */
