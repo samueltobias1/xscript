@@ -825,7 +825,8 @@ body.xs-home #xpz,body.xs-home #vtabs,body.xs-home #xmodes{visibility:hidden}
 body.xs-home #app{visibility:hidden}
 #xpz .acts{flex-wrap:nowrap}#xbar{min-width:0}#xpz{min-width:0;flex-shrink:1}
 @media (max-width:1320px){#xpz .seg{display:none}#xmodes button{padding:7px 9px!important;font-size:12.5px}#xpz .tabs button{padding:6px 8px!important;font-size:12.5px}#xbFile{max-width:160px}#xbar{gap:6px;padding:0 8px}#xpz{gap:5px}#vtCmp{max-width:90px}}
-@media (max-width:1000px){#xpz .tabs button[data-v="prog"]{display:none}#focusbtn,#paybtn{display:none!important}#xbFile{max-width:110px}#xbUser{display:none!important}}
+@media (max-width:1000px){#xpz .tabs button[data-v="prog"]{display:none}#focusbtn,#paybtn{display:none!important}#xbFile{max-width:110px}#xbUser{display:none!important}
+.xb-r{margin-left:auto}}
 
 /* ===== 4.0: nube ===== */
 .hhead{display:flex;align-items:center;gap:12px}.hhead .sp{flex:1}
@@ -852,11 +853,41 @@ body.xs-ro:not(.xs-home)::after{content:"Solo lectura · lo que muevas no se gua
 #home h1.slug span{color:var(--fg)}#home h1.slug em{font-style:normal;color:var(--accent)}
 #home h1.slug .sn{font-weight:400;color:var(--faint)!important;font-size:.8em}
 @media (max-width:620px){#home h1.slug{font-size:22px;gap:12px}}
+
+/* ===== 4.1 ===== */
+#xbUser{display:none!important}
+.xslogo em{color:var(--fg)!important}
+body.xs41 #xmodes button{font-size:0!important;gap:0;padding:6px 9px!important;display:flex;align-items:center}
+body.xs41 #xmodes button svg{display:block!important;width:17px;height:17px}
+body.xs41 #xmodes button[aria-pressed="true"]{font-size:12.5px!important;gap:6px;padding:6px 12px 6px 10px!important}
+.vdd{display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);font-size:13px;color:var(--fg);white-space:nowrap}
+.vdd .car{color:var(--mute);font-size:11px}.vdd:hover{border-color:var(--accent)}
+.vchip{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:#2fd283;color:#06210f;font-weight:600;font-size:12px;white-space:nowrap}
+.vchip span{opacity:.6}
+.xmenu .vrow.cur b{color:var(--accent)}
+.card .dfb.mov{background:#5b8cff;color:#fff}.card .dfb.off{background:#6b7080;color:#fff}
+#lockban{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:310;display:flex;align-items:center;gap:10px;background:#2b2f37;color:#ffd166;border:1px solid #ffd16655;padding:6px 8px 6px 14px;border-radius:999px;font-size:12.5px;white-space:nowrap}
+#lockban button{background:#3a3f4a;color:var(--fg);border-radius:999px;padding:4px 10px;font-size:12px}
+body.xs-locked.xs-ro::after{display:none}
+@media (max-width:700px){
+  #xbar{gap:4px!important;padding:0 6px!important;height:46px}
+  .xslogo{font-size:12px}.xbrand{padding:4px 5px!important}
+  body.xs41 #xmodes button[aria-pressed="true"]{font-size:0!important;padding:6px 9px!important}
+  #xbFile{display:none!important}
+  #xpz{display:none!important}
+  .huser{display:none!important}
+  #home .hhead{display:block}
+  #xpz .tabs button{padding:5px 7px!important;font-size:12px!important}
+  .vdd{padding:5px 8px;font-size:12px}.vchip{padding:4px 8px;font-size:11px}
+  .rastro .lab{display:none}.rastro .tr{left:0!important}
+  #home .hw{padding:0 4px}
+  #lockban{font-size:11px;white-space:normal;width:calc(100vw - 24px);border-radius:12px}
+}
 </style>
 </head>
 <body>
 <div id="xsroot"><div id="xbar">
-  <div class="xb-l"><button class="xbrand" id="xbHome" title="Inicio: proyectos recientes (Ctrl+O)"><span class="xslogo">INT. <em>XSCRIPT</em></span></button></div>
+  <div class="xb-l"><button class="xbrand" id="xbHome" title="Inicio: proyectos recientes (Ctrl+O)"><span class="xslogo"><em>XSCRIPT</em></span></button></div>
   <div id="xmodes" role="tablist">
     <button data-m="rev" aria-pressed="false" title="Revisión: lee el guion y raya con tu pluma (Alt+1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg>Revisión</button>
     <button data-m="piz" aria-pressed="true" title="Pizarrón: tarjetas, Save the Cat y arcos (Alt+2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="8" height="7" rx="1.5"/><rect x="13" y="4" width="8" height="7" rx="1.5"/><rect x="3" y="14" width="8" height="6" rx="1.5"/><rect x="13" y="14" width="8" height="6" rx="1.5"/></svg>Pizarrón</button>
@@ -892,7 +923,7 @@ body.xs-ro:not(.xs-home)::after{content:"Solo lectura · lo que muevas no se gua
     </div>
   </div>
   <div id="mainmenu" hidden role="menu">
-    <div class="mh">Pizarrón · XSCRIPT 4.0</div>
+    <div class="mh">Pizarrón · XSCRIPT 4.1</div>
     <button data-act="sumexp" role="menuitem"><b>Exportar para resumir</b><small>Baja el texto de las escenas para que Claude escriba títulos y resúmenes</small></button>
     <button data-act="sumimp" role="menuitem"><b>Importar resúmenes</b><small>Pone en las tarjetas los títulos y resúmenes que te regrese Claude</small></button>
     <button data-act="close" role="menuitem"><b>Ir al inicio</b><small>Lo guarda y vuelve a los proyectos recientes</small></button>
@@ -1308,6 +1339,7 @@ body.simple #modes.peek{opacity:1;pointer-events:auto}
 body.simple #tbl{top:0}
 body.simple #shandle{display:block;position:fixed;top:0;left:50%;transform:translateX(-50%);width:64px;height:7px;border-radius:0 0 8px 8px;background:#59616a;opacity:.35;z-index:34}
 body.simple #shandle:hover{opacity:.9}
+@media (max-width:700px){#bar{overflow-x:auto;flex-wrap:nowrap!important;scrollbar-width:none}#bar::-webkit-scrollbar{display:none}#bar>*{flex:none}}
 .card.xn .xnd{background:transparent!important;border:1.5px solid #9aa0aa;box-sizing:border-box}.card.xn .sc{color:#8fb4ff}.card.xn .xnb{font-size:11px;opacity:.75;padding:2px 7px;border-radius:6px;border:1px solid currentColor;background:none;color:inherit;cursor:pointer}.card.xn.done{opacity:.55}
 
 body.hosted #welcome,body.hosted #brand,body.hosted [data-act="newproj"],body.hosted [data-act="openproj"],body.hosted [data-act="saveproj"],body.hosted #pstat,body.hosted #modes [data-mode],body.hosted #modes .msep,body.hosted #pmenu{display:none!important}
@@ -2181,7 +2213,7 @@ const LOCK_SVG=`<svg class="thi" viewBox="0 0 24 24" width="13" height="13" fill
 const tsym=k=>k==='co'?THUMB_SVG:k==='lk'?LOCK_SVG:TYPES[k].sym;
 const S={pdf:null,bytes:null,name:'',fp:'',n:0,page:1,tool:'pen',
   col:{pen:'#d6402f',marker:'#f2b705'},colBd:{pen:'#2f6fe0',marker:'#2f6fe0'},mode:'rev',both:false,simple:false,dept:'VFX',fDept:'all',fh:null,fhOK:false,exBd:{po:true,lk:true,ds:false},exDept:'all',size:{pen:2,marker:3},
-  fit:'page',zoom:1,groups:[],onlyC:false,dark:false,groupMs:5000,lastG:null,align:0,maxOff:0,
+  fit:'page',zoom:1,groups:[],onlyC:false,dark:(()=>{try{return window.parent!==window&&!!window.parent.XS}catch(e){return false}})(),groupMs:5000,lastG:null,align:0,maxOff:0,
   scenes:[],fType:'all',fScene:'all',fShow:'com',fTool:'all',fState:'all',fQ:'',selId:null,exMarks:false,exTypes:{aj:true,po:true,co:true,none:true}};
 const HOST=(()=>{try{return window.parent!==window&&window.parent.XS?window.parent.XS:null}catch(e){return null}})();
 if(HOST)document.body.classList.add('hosted');
@@ -2205,7 +2237,7 @@ const stage=$('#stage'),pagesEl=$('#pages'),bar=$('#bar'),panel=$('#panel'),plis
 
 try{
   const p=JSON.parse((HOST?HOST.getPrefs('sh'):localStorage.getItem('revisor-guiones:prefs'))||'null');
-  if(p){if(p.col)Object.assign(S.col,p.col);if(p.colBd)Object.assign(S.colBd,p.colBd);if(p.dept)S.dept=p.dept;S.simple=!!p.simple;if(p.size)Object.assign(S.size,p.size);if(p.fit)S.fit=p.fit;S.dark=!!p.dark;if(p.groupMs)S.groupMs=p.groupMs;if(typeof p.align==='number')S.align=clamp(p.align,-1,1);}
+  if(p){if(p.col)Object.assign(S.col,p.col);if(p.colBd)Object.assign(S.colBd,p.colBd);if(p.dept)S.dept=p.dept;S.simple=!!p.simple;if(p.size)Object.assign(S.size,p.size);if(p.fit)S.fit=p.fit;S.dark=p.dark==null?!!HOST:!!p.dark;if(HOST&&p.dark==null)S.dark=true;if(p.groupMs)S.groupMs=p.groupMs;if(typeof p.align==='number')S.align=clamp(p.align,-1,1);}
 }catch(e){}
 const savePrefs=()=>{try{(HOST?HOST.setPrefs.bind(HOST,'sh'):localStorage.setItem.bind(localStorage,'revisor-guiones:prefs'))(JSON.stringify({col:S.col,colBd:S.colBd,dept:S.dept,simple:S.simple,size:S.size,fit:S.fit,dark:S.dark,groupMs:S.groupMs,align:S.align}))}catch(e){}};
 
@@ -2595,7 +2627,8 @@ const normP=(e,r)=>({x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height})
 pagesEl.addEventListener('contextmenu',e=>{if(e.target.classList&&e.target.classList.contains('ink'))e.preventDefault();});
 pagesEl.addEventListener('pointerdown',e=>{
   const cv=e.target;
-  if(!S.pdf||e.pointerType==='touch'||!cv.classList||!cv.classList.contains('ink'))return;
+  if(e.pointerType==='pen'){try{localStorage.setItem('xs:pen','1')}catch(_){}}
+  if(!S.pdf||(e.pointerType==='touch'&&!fingerDraws())||!cv.classList||!cv.classList.contains('ink'))return;
   const tail=e.button===5||(e.buttons&32)||(e.pointerType==='pen'&&(e.buttons&2));
   if(e.pointerType==='mouse'&&e.button!==0)return;
   const P=PG[+cv.parentNode.dataset.n];if(!P||P.inkc.width<2)return;
@@ -2744,9 +2777,11 @@ stage.addEventListener('wheel',e=>{
   if(dx&&!overflowX()&&S.maxOff>=1){e.preventDefault();shiftBy(dx);}
 },{passive:false});
 
+function fingerDraws(){let m='auto';try{m=(HOST&&HOST.fingerMode)||'auto'}catch(_){}if(m==='draw')return true;if(m==='move')return false;let pen=false;try{pen=localStorage.getItem('xs:pen')==='1'}catch(_){}return !pen&&matchMedia('(pointer:coarse)').matches;}
 /* ---------- dedos (iPad): 1 dedo = scroll vertical, 2 dedos = mover y zoom. La pluma sigue rayando ---------- */
 {
-const TP=new Map();let tg=null,traf=0;
+const TP=new Map();let tg=null,traf=0,drawTouch=null;
+addEventListener('pointerup',e=>{if(e.pointerId===drawTouch)drawTouch=null},true);addEventListener('pointercancel',e=>{if(e.pointerId===drawTouch)drawTouch=null},true);
 stage.style.touchAction='none';
 document.addEventListener('gesturestart',e=>e.preventDefault());
 document.addEventListener('gesturechange',e=>e.preventDefault());
@@ -2757,6 +2792,8 @@ function tgStart(){const p=[...TP.values()];
 stage.addEventListener('pointerdown',e=>{
   if(e.pointerType!=='touch'||!S.pdf)return;
   if(e.target.closest&&e.target.closest('textarea,input,button,select,.qc,#qc'))return;
+  if(drawTouch!=null&&TP.size===0)return;
+  if(TP.size===0&&fingerDraws()&&e.target.classList&&e.target.classList.contains('ink')&&['pen','marker','eraser','note'].includes(S.tool)){drawTouch=e.pointerId;return;}
   e.preventDefault();e.stopPropagation();cancelAnimationFrame(traf);
   TP.set(e.pointerId,{x:e.clientX,y:e.clientY});try{stage.setPointerCapture(e.pointerId);}catch(_){}
   tgStart();},true);
@@ -4099,7 +4136,7 @@ if(location.hash==='#debug')window.__rv={S,setSimple,closeProject,showDpop,deptO
 </html>
 </script>
 <div id="welcome" hidden><div class="wc"><h1>Rayos X</h1><p>Tu guion como un lienzo infinito: cada escena es una tarjeta que puedes mover, ordenar sobre Save the Cat o el viaje del héroe, y seguir por personaje.</p>
-<div class="wb"><button class="btn pri" data-act="pdf">Abrir guion (PDF)</button><button class="btn" data-act="open">Abrir proyecto</button><button class="btn" data-act="demo">Ver ejemplo</button></div><small>XSCRIPT 4.0</small></div></div>
+<div class="wb"><button class="btn pri" data-act="pdf">Abrir guion (PDF)</button><button class="btn" data-act="open">Abrir proyecto</button><button class="btn" data-act="demo">Ver ejemplo</button></div><small>XSCRIPT 4.1</small></div></div>
 <div id="emp" hidden><input id="emq" type="search" placeholder="Buscar emoji (carita, fuego, claqueta…)" autocomplete="off"><div id="emt"></div><div id="emg"></div><label class="emr">Tamaño al pegar <input id="emsz" type="range" min="20" max="200" value="48"><b id="emszv">48</b></label></div>
 <div id="showpop" hidden></div>
 <div id="focus" hidden role="dialog" aria-label="Modo focus">
@@ -5826,7 +5863,7 @@ const PDFMEM={};
 const dirty=new Set();let flushT=0;
 const verById=id=>XP&&XP.vers.find(v=>v.id===id);
 const metaOf=()=>({id:XP.id,name:XP.name,created:XP.created,updated:XP.updated,cur:XP.cur,cfg:XP.cfg||{},
-  vers:XP.vers.map(v=>({id:v.id,label:v.label,pdfName:v.pdfName,added:v.added,hasPdf:!!v.hasPdf,scenes:v.P.scenes.filter(s=>!s.nw).length,pages:Math.round(v.P.scenes.filter(s=>s.on!==false).reduce((a,s)=>a+(s.pages||0),0)/8*10)/10}))});
+  vers:XP.vers.map(v=>({id:v.id,label:v.label,pdfName:v.pdfName,added:v.added,hasPdf:!!v.hasPdf,locked:!!v.locked,dupOf:v.dupOf||null,scenes:v.P.scenes.filter(s=>!s.nw).length,pages:Math.round(v.P.scenes.filter(s=>s.on!==false).reduce((a,s)=>a+(s.pages||0),0)/8*10)/10}))});
 function setSaveState(s){const e=$('#xbSave');if(e){e.className=s==='pend'?'pend':s==='err'?'err':'';e.title=s==='pend'?'Guardando…':s==='err'?'No se pudo guardar':'Guardado en este navegador'}}
 function schedFlush(){clearTimeout(flushT);setSaveState('pend');flushT=setTimeout(flush,450)}
 XSX.save=()=>{if(!XP||!curV)return;dirty.add(curV.id);schedFlush()};
@@ -7206,13 +7243,14 @@ const _markDirty6=markDirty;
 markDirty=function(){
   if(!cloud())return _markDirty6();
   if(!XP||!CL.pid||!CL.canEdit)return;
+  CL.gen=(CL.gen||0)+1;
   if(!CL.dirty){CL.dirty=true;setWork({unsaved:true,at:Date.now()})}
   paintFile();clearTimeout(saveT6);saveT6=setTimeout(()=>cloudSave(),1800)};
 async function cloudSave(now){
   if(!CL.pid||!CL.canEdit)return;
   if(CL.saving){CL.again=true;return}
   if(!CL.dirty&&!now)return;
-  CL.saving=true;paintFile();
+  CL.saving=true;paintFile();const gen0=CL.gen||0;
   try{
     await uploadPdfs();
     const {body,gz:g}=await gz(await bundleCloud());
@@ -7220,12 +7258,12 @@ async function cloudSave(now){
     if(r.status===409){CL.saving=false;conflictDlg(await r.json().catch(()=>({})));return}
     if(r.status===423){CL.saving=false;lostTurn(await r.json().catch(()=>({})));return}
     if(!r.ok)throw new Error(await errMsg(r));
-    const j=await r.json();CL.rev=j.rev;CL.dirty=false;CL.err=null;CL.offline=false;CL.savedAt=Date.now();backoff=2000;
-    setWork({unsaved:false,rev:CL.rev,at:Date.now()});
+    const j=await r.json();CL.rev=j.rev;CL.dirty=(CL.gen||0)!==gen0;CL.err=null;CL.offline=false;CL.savedAt=Date.now();backoff=2000;
+    if(!CL.dirty)setWork({unsaved:false,rev:CL.rev,at:Date.now()});
   }catch(e){
     if(e instanceof TypeError||!navigator.onLine){CL.offline=true;CL.err=null}else CL.err=e.message||String(e);
     clearTimeout(saveT6);saveT6=setTimeout(()=>cloudSave(true),backoff);backoff=Math.min(backoff*2,60000)}
-  finally{CL.saving=false;paintFile();if(CL.again){CL.again=false;if(CL.dirty)cloudSave()}}}
+  finally{CL.saving=false;paintFile();if(CL.again||CL.dirty){CL.again=false;if(CL.dirty&&!CL.err&&!CL.offline){clearTimeout(saveT6);saveT6=setTimeout(()=>cloudSave(),600)}}}}
 addEventListener('online',()=>{if(cloud()&&CL.dirty)cloudSave(true)});
 addEventListener('beforeunload',e=>{
   if(!cloud()||!CL.pid)return;
@@ -7521,6 +7559,172 @@ CLOUDP.then(()=>{if(!cloud())return;const pid=new URLSearchParams(location.searc
 window.__cl=CL;
 
 const _ms6=XSX.manualSave;XSX.manualSave=async as=>{if(!cloud())return _ms6(as);if(CL.canEdit){await cloudSave(true);if(!CL.err&&!CL.offline)toast('Guardado en la nube',1800)}else toast('Estás en lectura: no se guarda',2500);return true};
+
+/* ================= XSCRIPT 4.1 · menú de versiones, duplicar y proteger, comparar tableros, barra compacta, teléfono ================= */
+
+/* ---------- dedo en Revisión: auto / rayar / mover ---------- */
+Object.defineProperty(window.XS,'fingerMode',{get(){return PR.finger||'auto'},configurable:true});
+
+/* ---------- versiones: duplicar ---------- */
+async function dupVersion(src){
+  if(!XP||!src)return;
+  try{if(mode!=='piz'&&frame&&frame.contentWindow.__xsh)frame.contentWindow.__xsh.flush()}catch(_){}
+  const nm=await XSX.askVerName(src.label+' · Sam','Nombre de la copia');if(!nm)return;
+  const P2=finishProject(JSON.parse(src.locked&&src.frozenP?src.frozenP:serializeP(src.P)));
+  const rev2=src.rev?JSON.parse(JSON.stringify(src.locked&&src.frozenRev?JSON.parse(src.frozenRev):src.rev)):null;
+  const v={id:uid(),label:nm,pdfName:src.pdfName,added:Date.now(),P:P2,rev:rev2,stats:src.stats?JSON.parse(JSON.stringify(src.stats)):null,hasPdf:!!src.hasPdf,dupOf:src.id};
+  const bytes=await getPdf(src.id);
+  if(bytes){PDFMEM[v.id]=bytes;try{await dbPut('pdf',v.id,bytes)}catch(_){}v.hasPdf=true}
+  XP.vers.splice(XP.vers.indexOf(src)+1,0,v);
+  dirty.add(v.id);activate(v);markDirty();
+  const c=cmpOf(v);c.base=src.id;c.on=false;
+  toast('Copia lista: «'+nm+'». La original queda como estaba. Para ver qué cambiaste, prende Comparar en el menú de versiones.',5500)}
+
+/* ---------- versiones: proteger (solo lectura) ---------- */
+function freeze(v){v.frozenP=serializeP(v.P);v.frozenRev=v.rev?JSON.stringify(v.rev):null}
+function setLocked(v,on){
+  if(on){freeze(v);v.locked=true}else{v.locked=false;delete v.frozenP;delete v.frozenRev}
+  dirty.add(v.id);markDirty();paintLocked();buildVTabs();
+  toast(on?'«'+v.label+'» protegida: nadie la puede cambiar por accidente. Duplícala para trabajar sobre ella.':'«'+v.label+'» ya se puede editar',4500)}
+const pOf7=v=>v.locked&&v.frozenP?v.frozenP:serializeP(v.P);
+const rOf7=v=>v.locked&&v.frozenP?(v.frozenRev?JSON.parse(v.frozenRev):null):(v.rev||null);
+/* lo que se guarda de una versión protegida es siempre su foto congelada */
+flush=async function(){
+  clearTimeout(flushT);if(!XP)return;
+  const ids=[...dirty];dirty.clear();
+  try{XP.updated=Date.now();
+    for(const id of ids){const v=verById(id);if(v)await dbPut('ver',id,{P:pOf7(v),rev:rOf7(v),stats:v.stats||null})}
+    await dbPut('proj',XP.id,metaOf());setSaveState('ok')}
+  catch(e){console.error(e);setSaveState('err')}};
+bundleNow=async function(){
+  try{if(mode!=='piz'&&frame&&frame.contentWindow.__xsh)frame.contentWindow.__xsh.flush()}catch(_){}
+  const meta=Object.assign(metaOf(),{name:(typeof FILE!=='undefined'&&FILE)?FILE.name:XP.name}),versions=[];
+  for(const v of XP.vers){
+    const pdf=await getPdf(v.id);let b=null;if(pdf){b=B64C[v.id]&&B64C[v.id].n===pdf.length?B64C[v.id].b:null;if(!b){b=b64(pdf);B64C[v.id]={n:pdf.length,b}}}
+    versions.push({meta:meta.vers.find(m=>m.id===v.id),P:pOf7(v),rev:rOf7(v),stats:v.stats||null,pdf:b})}
+  return JSON.stringify({app:'xscript',v:3,saved:new Date().toISOString(),project:{meta,versions}})};
+bundleCloud=async function(){
+  try{if(mode!=='piz'&&frame&&frame.contentWindow.__xsh)frame.contentWindow.__xsh.flush()}catch(_){}
+  const meta=Object.assign(metaOf(),{name:XP.name});
+  return JSON.stringify({app:'xscript',v:3,saved:new Date().toISOString(),project:{meta,versions:XP.vers.map(v=>({meta:meta.vers.find(m=>m.id===v.id),P:pOf7(v),rev:rOf7(v),stats:v.stats||null,pdf:null}))}})};
+/* metaOf no sabe de locked/dupOf: los agregamos */
+{const _mo=metaOf;window.__metaOf7=()=>{const m=_mo();m.vers.forEach(x=>{const v=verById(x.id);if(v){if(v.locked)x.locked=true;if(v.dupOf)x.dupOf=v.dupOf}});return m}}
+/* las notas de Revisión de una versión protegida no se guardan */
+{const _rs=window.XS.revSave;window.XS.revSave=function(vid,data){const v=verById(vid);if(v&&v.locked){return}return _rs.call(window.XS,vid,data)}}
+function paintLocked(){
+  const lk=!!(curV&&curV.locked);
+  document.body.classList.toggle('xs-locked',lk);
+  let b=$('#lockban');
+  if(!lk){if(b)b.remove();return}
+  if(!b){b=document.createElement('div');b.id='lockban';document.body.appendChild(b)}
+  b.innerHTML='🔒 «'+esc(curV.label)+'» está protegida · lo que muevas no se guarda <button id="lbDup">Duplicar para trabajar</button><button id="lbUn">Desproteger</button>';
+  b.querySelector('#lbDup').onclick=()=>dupVersion(curV);
+  b.querySelector('#lbUn').onclick=()=>askSure('¿Quitar la protección de «'+curV.label+'»?','Desproteger',()=>setLocked(curV,false))}
+const _act7=activate;
+activate=function(v){
+  if(v&&v.locked){if(!v.frozenP)freeze(v);else{try{v.P=finishProject(JSON.parse(v.frozenP));v.rev=v.frozenRev?JSON.parse(v.frozenRev):null}catch(_){}}}
+  _act7(v);paintLocked();
+  [120,600,1500].forEach(t=>setTimeout(regroup,t))};
+
+/* ---------- comparar una copia contra su original: cambios del tablero ---------- */
+const _calc7=calcDiff;
+calcDiff=function(){
+  DIFF=null;if(!curV)return;const c=cmpOf(curV);if(!c.on||!c.base)return;
+  const A=verById(c.base);if(!A||A===curV){c.on=false;return}
+  const aIds=new Set(A.P.scenes.map(s=>s.id)),shared=curV.P.scenes.filter(s=>aIds.has(s.id)).length;
+  if(shared<Math.max(3,curV.P.scenes.length*.6))return _calc7();
+  const AP=A.locked&&A.frozenP?JSON.parse(A.frozenP):A.P,am=new Map(AP.scenes.map(s=>[s.id,s]));
+  const pa=(AP.views&&AP.views.stc&&AP.views.stc.pos)||{},pb=(curV.P.views&&curV.P.views.stc&&curV.P.views.stc.pos)||{};
+  const txt=s=>JSON.stringify([s.title||'',s.note||'',s.head||'',(s.chars||[]).join(','),s.pages,s.nw?JSON.stringify(s.doc||''):'']);
+  DIFF={};const tot={same:0,changed:0,moved:0,news:0,gone:0};
+  curV.P.scenes.forEach(s=>{
+    const a=am.get(s.id);
+    if(!a){DIFF[s.id]={k:'new',sub:s.nw?'card':'new'};tot.news++;return}
+    let sub=null;
+    if((a.on!==false)!==(s.on!==false))sub=s.on===false?'off':'on';
+    else if(txt(a)!==txt(s))sub='edit';
+    else if(pa[s.id]&&pb[s.id]&&Math.hypot(pa[s.id].x-pb[s.id].x,pa[s.id].y-pb[s.id].y)>60)sub='mov';
+    if(sub){DIFF[s.id]={k:'chg',sub,a};if(sub==='mov')tot.moved++;else tot.changed++}else{DIFF[s.id]={k:'same'};tot.same++}});
+  const bIds=new Set(curV.P.scenes.map(s=>s.id));DIFF._gone=AP.scenes.filter(s=>!bIds.has(s.id));tot.gone=DIFF._gone.length;
+  DIFF._tot=tot;DIFF._A=A;DIFF._board=true};
+const SUBL={card:'TARJETA NUEVA',new:'NUEVA',off:'APAGADA',on:'ENCENDIDA',edit:'EDITADA',mov:'MOVIDA'};
+const _bdg7=XSX.badges;
+XSX.badges=(e,s)=>{
+  _bdg7(e,s);
+  const d=DIFF&&DIFF[s.id],b=e.querySelector('.dfb');
+  if(d&&d.sub&&b){b.hidden=false;b.textContent=SUBL[d.sub]||b.textContent;b.classList.toggle('mov',d.sub==='mov');b.classList.toggle('off',d.sub==='off');
+    if(d.k==='new'&&s.nw){e.classList.add('df-new');b.className='dfb new'}
+    b.title=(SUBL[d.sub]||'')+' respecto a '+DIFF._A.label}};
+
+/* ---------- barra: menú de versiones ---------- */
+buildVTabs=function(){
+  const el=$('#vtabs');if(!XP){el.hidden=true;return}
+  el.hidden=false;
+  const c=curV?cmpOf(curV):{},A=c.on&&verById(c.base);
+  el.innerHTML=`<button class="vdd" id="vDD" title="Versiones del guion">${curV&&curV.locked?'🔒 ':''}<b>${esc(curV?curV.label:'')}</b><span class="car">▾</span></button>`
+    +(A?`<button class="vchip" id="vCmpOff" title="Comparando con ${esc(A.label)} · toca para apagar">⇄ ${esc(A.label)} <span>✕</span></button>`:'');
+  updBar&&0};
+function versionsMenu(anchor){
+  const c=cmpOf(curV),others=XP.vers.filter(v=>v!==curV),t=DIFF&&DIFF._tot;
+  const html=`<div class="mh">Versiones</div>
+   ${XP.vers.map(v=>`<button data-x="v:${v.id}" class="vrow${v===curV?' cur':''}"><b>${v===curV?'● ':''}${v.locked?'🔒 ':''}${esc(v.label)}</b><small>${esc((v.pdfName||'').replace(/\.pdf$/i,''))}${v.dupOf&&verById(v.dupOf)?' · copia de '+esc(verById(v.dupOf).label):''}</small></button>`).join('')}
+   <button data-x="add">＋ Nueva versión (PDF)…<small>Otro guion: se crea su propia pestaña</small></button>
+   <hr><div class="mh">${esc(curV.label)}</div>
+   <button data-x="dup">Duplicar esta versión<small>Una copia para trabajar tus ajustes; la original no se toca</small></button>
+   <button data-x="lock">${curV.locked?'Desproteger':'Proteger (solo lectura)'}<small>${curV.locked?'Vuelve a poder editarse':'Para que nadie la cambie por accidente'}</small></button>
+   <button data-x="ren">Renombrar</button>
+   ${XP.vers.length>1?`<button data-x="mvl"${XP.vers.indexOf(curV)>0?'':' hidden'}>Mover a la izquierda</button><button data-x="mvr"${XP.vers.indexOf(curV)<XP.vers.length-1?'':' hidden'}>Mover a la derecha</button>`:''}
+   ${XP.vers.length>1?`<hr><div class="mh">Comparar ${c.on&&t?'· '+t.news+' nuevas · '+(t.changed+t.moved)+' cambios':''}</div>
+   ${others.map(v=>`<button data-x="b:${v.id}" data-keep="1">${c.on&&c.base===v.id?'● ':'○ '}contra ${esc(v.label)}</button>`).join('')}
+   ${c.on?'<button data-x="off">Apagar comparación</button>':''}
+   <button data-x="only" data-keep="1">${c.only?'✓ ':''}Solo cambios<small>Atenúa lo que no cambió</small></button>
+   <button data-x="split" data-keep="1">${c.split?'✓ ':''}Ver los dos pizarrones</button>
+   <button data-x="list">Lista detallada…</button>`:''}
+   ${XP.vers.length>1?`<hr><button class="dng" data-x="del">Eliminar esta versión…</button>`:''}`;
+  xmenu(anchor,html,(x)=>{
+    if(x.startsWith('v:')){const id=x.slice(2);if(id!==curV.id)switchTo(id);return}
+    if(x==='add'){pendingPdf='ver';$('#xsPdf').click();return}
+    if(x==='dup'){dupVersion(curV);return}
+    if(x==='lock'){if(curV.locked)askSure('¿Quitar la protección de «'+curV.label+'»?','Desproteger',()=>setLocked(curV,false));else setLocked(curV,true);return}
+    if(x==='ren'){xprompt('Nombre de la versión',curV.label,'Renombrar',n=>{curV.label=n;dirty.add(curV.id);markDirty();buildVTabs();updBar()});return}
+    if(x==='mvl'||x==='mvr'){XSX.moveVer(curV.id,x==='mvl'?-1:1);return}
+    if(x.startsWith('b:')){c.base=x.slice(2);c.on=true;cmpRefresh()}
+    else if(x==='off'){c.on=false;c.split=false;cmpRefresh();return}
+    else if(x==='only'){c.only=!c.only;if(c.only&&!c.on){c.on=true;c.base=c.base||defaultBase()}cmpRefresh()}
+    else if(x==='split'){c.split=!c.split;if(c.split&&!c.on){c.on=true;c.base=c.base||defaultBase()}cmpRefresh()}
+    else if(x==='list'){openCompare(c.base||defaultBase(),curV.id);return}
+    else if(x==='del'){askSure('Se borra la versión «'+curV.label+'» con su pizarrón, rayones y breakdown.','Sí, eliminar versión',()=>delVersion(curV.id));return}
+    const a=$('#vDD');if(a)setTimeout(()=>versionsMenu(a),0)})}
+$('#vtabs').addEventListener('click',e=>{
+  const dd=e.target.closest('#vDD'),off=e.target.closest('#vCmpOff');
+  if(!dd&&!off)return;e.stopImmediatePropagation();e.preventDefault();
+  if(off){const c=cmpOf(curV);c.on=false;c.split=false;cmpRefresh();return}
+  versionsMenu(dd)},true);
+XSX.cmpBtns=()=>'';
+
+/* ---------- grupos de Save the Cat: redibujar cuando ya hay medidas ---------- */
+function regroup(){try{if(XP&&mode==='piz'&&typeof drawGroups==='function'){drawGroups();if(typeof drawLinks==='function')drawLinks()}}catch(_){}}
+try{document.fonts&&document.fonts.ready.then(()=>setTimeout(regroup,50))}catch(_){}
+{const _sm7=showMode;showMode=async function(m){await _sm7(m);if(m==='piz')[60,500].forEach(t=>setTimeout(regroup,t))};XSX.setMode=showMode}
+addEventListener('resize',()=>{clearTimeout(window.__rg);window.__rg=setTimeout(regroup,250)});
+
+/* ---------- ajustes: un solo lugar (engrane) ---------- */
+function fingerRow(){return `<div class="row"><label>Dedo en Revisión</label><div class="seg2">${[['auto','Auto'],['draw','Raya'],['move','Mueve']].map(([k,t])=>`<button data-x="fg" data-fg="${k}" data-keep="1" aria-pressed="${(PR.finger||'auto')===k}" title="${k==='auto'?'Raya con el dedo hasta que uses una pluma (Pencil); después el dedo mueve la hoja':k==='draw'?'El dedo siempre raya; dos dedos mueven':'El dedo siempre mueve la hoja; raya con pluma'}">${t}</button>`).join('')}</div></div>`}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.xmenu [data-fg]');if(!b)return;
+  PR.finger=b.dataset.fg;savePR();b.parentNode.querySelectorAll('[data-fg]').forEach(k=>k.setAttribute('aria-pressed',k.dataset.fg===PR.finger))},true);
+new MutationObserver(()=>{
+  document.querySelectorAll('.xmenu').forEach(m=>{
+    if(m.dataset.fg7)return;const th=m.querySelector('[data-th]');if(!th)return;
+    m.dataset.fg7=1;th.closest('.row').insertAdjacentHTML('afterend',fingerRow());
+    if(cloud()&&CL.pid&&!m.querySelector('[data-x="users"]')){const sh=m.querySelector('[data-x="share"]');if(sh){sh.innerHTML='Usuarios y permisos…<small>Quién entra a este proyecto y qué puede hacer</small>';sh.dataset.x='share'}}})
+}).observe(document.body,{childList:true});
+$('#xbUser').hidden=true;
+
+/* ---------- modo compacto: el activo muestra su nombre ---------- */
+document.body.classList.add('xs41');
+
+window.__xs7={dupVersion,setLocked,versionsMenu};
 
 /* ================= arranque ================= */
 XSX.boot();
