@@ -6,3 +6,8 @@
 - El código de la app (HTML) se arma fuera de este repo (build de XSCRIPT: Rayos X + Script Houdini) y se copia a `deploy/app/index.html`.
 - Deploy: `ssh xscript@178.104.225.216` → `cd ~/xscript && ./deploy/deploy.sh`.
 - Root solo para mantenimiento del sistema (`ssh root@178.104.225.216`).
+
+## Nota sobre el código fuente (4.2)
+Los fuentes de armado (xs1..xs7, hostpatch.py, shpatch.py, build.py) se perdieron al reiniciarse el entorno de trabajo.
+`deploy/app/index.html` es ahora la fuente de verdad. Los cambios se aplican con parches sobre ese HTML:
+`tools/patch_4_2.py` (+ `xs42.js`, `xs42.css`, `fonts42.css`) transforma la 4.1 en la 4.2 y sirve de ejemplo.
