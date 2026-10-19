@@ -1,0 +1,17 @@
+/* ===== 4.4 save the cat por segmentos ===== */
+.g.band.mom{border-top-style:dotted!important}
+.g.band.mom b{font-weight:600}
+.g.band.nar{padding:5px 5px}
+.g.band.nar b{font-size:11.5px;white-space:normal;line-height:1.15}
+.g.band.nar span{font-size:10px}
+.g.band.vert b,.g.band.vert span{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;display:block}
+.g.band.vert{padding:4px 2px;text-align:center}
+.g.band.vert span{display:none}
+#zpop{position:absolute;right:12px;bottom:62px;z-index:41;width:270px;max-height:70vh;overflow:auto;padding:10px 12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);font-size:13px}
+#zpop[hidden]{display:none}
+#zpop h4{margin:0 0 4px;font-size:13px}
+#zpop p{margin:0 0 8px;color:var(--mute);font-size:12px;line-height:1.4}
+#zpop .zact{margin:8px 0 2px;font-size:11px;letter-spacing:.7px;text-transform:uppercase;color:var(--c)}
+#zpop .zrow{display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer}
+#zpop .zrow small{margin-left:auto;color:var(--faint);font-size:11px}
+#zpop button.btn{margin-top:10px;width:100%}

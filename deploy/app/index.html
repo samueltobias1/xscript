@@ -937,6 +937,23 @@ body.xs-locked.xs-ro::after{display:none}
 #emptyb[hidden]{display:none}
 #emptyb b{font-size:20px;color:var(--fg)}
 #emptyb span{font-size:14px;line-height:1.5}
+/* ===== 4.4 save the cat por segmentos ===== */
+.g.band.mom{border-top-style:dotted!important}
+.g.band.mom b{font-weight:600}
+.g.band.nar{padding:5px 5px}
+.g.band.nar b{font-size:11.5px;white-space:normal;line-height:1.15}
+.g.band.nar span{font-size:10px}
+.g.band.vert b,.g.band.vert span{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;display:block}
+.g.band.vert{padding:4px 2px;text-align:center}
+.g.band.vert span{display:none}
+#zpop{position:absolute;right:12px;bottom:62px;z-index:41;width:270px;max-height:70vh;overflow:auto;padding:10px 12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);font-size:13px}
+#zpop[hidden]{display:none}
+#zpop h4{margin:0 0 4px;font-size:13px}
+#zpop p{margin:0 0 8px;color:var(--mute);font-size:12px;line-height:1.4}
+#zpop .zact{margin:8px 0 2px;font-size:11px;letter-spacing:.7px;text-transform:uppercase;color:var(--c)}
+#zpop .zrow{display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer}
+#zpop .zrow small{margin-left:auto;color:var(--faint);font-size:11px}
+#zpop button.btn{margin-top:10px;width:100%}
 </style>
 </head>
 <body>
@@ -977,7 +994,7 @@ body.xs-locked.xs-ro::after{display:none}
     </div>
   </div>
   <div id="mainmenu" hidden role="menu">
-    <div class="mh">Pizarrón · XSCRIPT 4.3</div>
+    <div class="mh">Pizarrón · XSCRIPT 4.4</div>
     <button data-act="sumexp" role="menuitem"><b>Exportar para resumir</b><small>Baja el texto de las escenas para que Claude escriba títulos y resúmenes</small></button>
     <button data-act="sumimp" role="menuitem"><b>Importar resúmenes</b><small>Pone en las tarjetas los títulos y resúmenes que te regrese Claude</small></button>
     <button data-act="close" role="menuitem"><b>Ir al inicio</b><small>Lo guarda y vuelve a los proyectos recientes</small></button>
@@ -4279,7 +4296,11 @@ const STC_PTS=[['Opening Image',0,ic('<rect x="3" y="4" width="18" height="16" r
  ['Final Image',100,ic('<path d="M3 18h18M7 18a5 5 0 0110 0M12 4v4M5 8l2 2M19 8l-2 2"/>')]];
 const FINALE=['Gather the Team','Execute the Plan','High Tower Surprise','Dig Deep Down','Execute the New Plan'];
 /* [nombre, desde %, hasta %, tono, acto] */
-const STC=[['Set-up',0,10,268,'Act I'],['Debate',10,20,252,'Act I'],['Fun and Games',20,50,322,'Act IIA'],['Bad Guys Close In',50,75,190,'Act IIB'],['Dark Night of the Soul',75,80,205,'Act IIB'],['Finale',80,100,92,'Act III']];
+const STC=[['Opening Image',0,2,285,'Act I','m'],['Theme Stated',2,5,275,'Act I','m'],['Set-up',5,10,268,'Act I','s'],['Catalyst',10,12,258,'Act I','m'],['Debate',12,18,250,'Act I','s'],['Break into 2',18,20,240,'Act I','m'],
+ ['B Story',20,23,335,'Act IIA','m'],['Fun and Games',23,48,322,'Act IIA','s'],['Midpoint',48,50,310,'Act IIA','m'],
+ ['Bad Guys Close In',50,73,190,'Act IIB','s'],['All Is Lost',73,75,200,'Act IIB','m'],['Dark Night of the Soul',75,78,208,'Act IIB','s'],['Break into 3',78,80,218,'Act IIB','m'],
+ ['Finale',80,98,92,'Act III','s'],['Final Image',98,100,75,'Act III','m']];
+const STC_OLDP=[0,10,20,50,75,80,100],STC_OLDI=[2,4,7,9,11,13];
 const HERO=[['Mundo ordinario',0,8],['Llamado',8,12],['Rechazo',12,16],['Mentor',16,20],['Umbral',20,25],['Pruebas y aliados',25,45],['Cueva profunda',45,52],['Calvario',52,60],['Recompensa',60,68],['Camino de vuelta',68,78],['Resurrección',78,92],['Retorno',92,100]].map((b,k)=>[b[0],b[1],b[2],(200+k*31)%360]);
 const BANDS={stc:STC,hero:HERO};
 const STAGES0=['Acto 1','Acto 2A','Acto 2B','Acto 3'];
@@ -4484,6 +4505,12 @@ const stepX=()=>Math.round((SIZES[P.size]+16)/rowsN());
 /* x de la frontera que deja a las primeras idx tarjetas a la izquierda (cuenta por centros) */
 const gridCut=idx=>X0+idx*stepX()+SIZES[P.size]/2-stepX()/2;
 function idxAtPct(p,sp){let n=0;P.scenes.forEach(s=>{if(sp[s.id]<p-1e-9)n++});return n}
+function migStc(v){
+  const E=v.edges,np=STC.map(d=>d[1]).concat([100]);
+  const xAt=p=>{for(let k=0;k<6;k++)if(p<=STC_OLDP[k+1]+1e-9)return E[k]+(p-STC_OLDP[k])/(STC_OLDP[k+1]-STC_OLDP[k])*(E[k+1]-E[k]);return E[6]};
+  v.edges=np.map(xAt);
+  if(Array.isArray(v.names)&&v.names.length===6){const nn=STC.map(d=>d[0]);v.names.forEach((t,k)=>{nn[STC_OLDI[k]]=t});v.names=nn}
+}
 function ensureGuides(vn){
   const v=P.views[vn],sp=startPct(),n=P.scenes.length,w=SIZES[P.size];
   if(vn==='free'){
@@ -4493,6 +4520,7 @@ function ensureGuides(vn){
     if(v.acts.length>k-1)v.acts.length=k-1;
     return;
   }
+  if(vn==='stc'&&v.edges&&v.edges.length===7)migStc(v);
   if(v.edges&&v.edges.length===BANDS[vn].length+1)return;
   const defs=BANDS[vn],E=[X0-20];
   defs.forEach((d,i)=>{const end=i===defs.length-1?X0+Math.max(0,n-1)*stepX()+w+20:gridCut(idxAtPct(d[2],sp));E.push(Math.max(end,E[E.length-1]+40))});
@@ -4530,28 +4558,34 @@ function drawBg0(){
   const defs=BANDS[view],E=v.edges,n=defs.length,span=E[n]-E[0],px=p=>E[0]+p/100*span,tot=totalPages(),isS=view==='stc';
   const stat=defs.map(()=>({n:0,pg:0}));
   P.scenes.forEach(s=>{if(!s.on)return;const p=v.pos[s.id];if(!p)return;const i=bandAt(view,p.x+cardW(s)/2);stat[i].n++;stat[i].pg+=s.pages});
-  const BT=isS?150:92;
-  if(isS){let i=0;while(i<n){let j=i;while(j+1<n&&defs[j+1][4]===defs[i][4])j++;g('actb',{left:(E[i]+2)+'px',width:Math.max(8,E[j+1]-E[i]-4)+'px',top:(BT-22)+'px',height:'18px',background:bandCol(defs[i][3],.34)},esc(defs[i][4]));i=j+1}}
+  const BT=isS?150:92,hid=(isS&&v.hid)||{},HV=i=>!!hid[i];
+  const ICON={};STC_PTS.forEach(f=>{ICON[f[0]]=f[2]});
+  if(isS){let i=0;while(i<n){let j=i;while(j+1<n&&defs[j+1][4]===defs[i][4])j++;
+    let a0=i,b0=j;while(a0<=j&&HV(a0))a0++;while(b0>=i&&HV(b0))b0--;
+    if(a0<=b0)g('actb',{left:(E[a0]+2)+'px',width:Math.max(8,E[b0+1]-E[a0]-4)+'px',top:(BT-22)+'px',height:'18px',background:bandCol(defs[i][3],.34)},esc(defs[i][4]));i=j+1}}
+  let lastVis=-1;
   defs.forEach((d,i)=>{
-    const x0=E[i],x1=E[i+1],st=stat[i];
-    g('band',{left:(x0+2)+'px',width:Math.max(8,x1-x0-4)+'px',top:BT+'px',height:'64px',background:bandCol(d[3],.17),borderTop:'3px solid '+bandCol(d[3])},
-      `<b>${esc(bandName(view,i))}</b><span class="${st.n?'':'empty'}">${st.n} esc · ${st.pg?fmt8(st.pg):'0'} pág · ${Math.round(st.pg/tot*100)}%</span>`);
-    hdl('bt',{left:(x0+8)+'px',top:(BT+4)+'px',width:Math.max(10,Math.min(x1-x0-16,200))+'px',height:'18px'},'',{bnd:i});
+    if(HV(i))return;lastVis=i;
+    const x0=E[i],x1=E[i+1],st=stat[i],w=x1-x0,mom=isS&&d[5]==='m',nm=bandName(view,i);
+    let e0=i;while(e0>0&&HV(e0-1))e0--;
+    const cls='band'+(mom?' mom':'')+(isS&&w<150?' nar':'')+(isS&&w<64?' vert':'');
+    g(cls,{left:(x0+2)+'px',width:Math.max(8,w-4)+'px',top:BT+'px',height:'64px',background:bandCol(d[3],.17),borderTop:'3px solid '+bandCol(d[3])},
+      `<b>${esc(nm)}</b><span class="${st.n?'':'empty'}">${isS&&w<150?st.n+' esc':st.n+' esc · '+(st.pg?fmt8(st.pg):'0')+' pág · '+Math.round(st.pg/tot*100)+'%'}</span>`);
+    hdl('bt',{left:(x0+8)+'px',top:(BT+4)+'px',width:Math.max(10,Math.min(w-16,200))+'px',height:'18px'},'',{bnd:i});
     g('bline',{left:x0+'px',top:BT+'px',height:(H-BT)+'px'});
-    hdl('bh',{left:x0+'px',top:BT+'px',height:'64px'},'',{band:i});
+    hdl('bh',{left:x0+'px',top:BT+'px',height:'64px'},'',{band:e0});
   });
-  hdl('bh',{left:E[n]+'px',top:BT+'px',height:'64px'},'',{band:n});
-  g('bline',{left:E[n]+'px',top:BT+'px',height:(H-BT)+'px'});
+  {let e1=lastVis+1;hdl('bh',{left:E[lastVis+1]+'px',top:BT+'px',height:'64px'},'',{band:e1});
+   g('bline',{left:E[lastVis+1]+'px',top:BT+'px',height:(H-BT)+'px'})}
   // la fórmula como sombra: proporcional al largo actual
   const gy=BT+68;
-  defs.forEach((d,i)=>{if(i===0)return;const x=px(d[1]);g('ghost',{left:x+'px',top:gy+'px',height:'24px'});g('ghostl',{left:x+'px',top:(gy+24)+'px'},d[1]+'%')});
+  defs.forEach((d,i)=>{if(i===0||HV(i))return;const x=px(d[1]);g('ghost',{left:x+'px',top:gy+'px',height:'24px'});if(E[i+1]-E[i]>=44)g('ghostl',{left:x+'px',top:(gy+24)+'px'},d[1]+'%')});
   g('ghostl',{left:(E[0]-8)+'px',top:(gy+24)+'px',transform:'translateX(-100%)'},'fórmula');
   if(isS){
-    STC_PTS.forEach((f,k)=>{const lv=[0,40,80][k%3],fp=v.flagPos&&v.flagPos[f[0]],fx=fp?fp.x:px(f[1]),fy=fp?fp.y:lv,pc=Math.round((fx-E[0])/span*100);
-      hdl('flag',{left:fx+'px',top:fy+'px'},f[2]+'<span>'+esc(f[0])+'</span><small>'+pc+'%</small>',{flag:f[0]});if(fy+30<BT)g('ghost',{left:fx+'px',top:(fy+30)+'px',height:(BT-fy-30)+'px'})});
-    const fa=E[5],FW=E[6]-E[5],sf=(v.sub&&v.sub.length===4)?v.sub:[.2,.4,.6,.8],bd=[0].concat(sf,[1]);
-    FINALE.forEach((t,k)=>g('sub',{left:(fa+bd[k]*FW+2)+'px',width:Math.max(6,(bd[k+1]-bd[k])*FW-4)+'px',top:(gy+46)+'px',background:bandCol(defs[5][3],.14)},'<i>'+(k+1)+'</i> '+esc(t)));
-    sf.forEach((f,k)=>hdl('bh sh',{left:(fa+f*FW)+'px',top:(gy+46)+'px',height:'22px'},'',{sub:k}));
+    const fi=defs.findIndex(d=>d[0]==='Finale');
+    if(!HV(fi)){const fa=E[fi],FW=E[fi+1]-E[fi],sf=(v.sub&&v.sub.length===4)?v.sub:[.2,.4,.6,.8],bd=[0].concat(sf,[1]);
+      FINALE.forEach((t,k)=>g('sub',{left:(fa+bd[k]*FW+2)+'px',width:Math.max(6,(bd[k+1]-bd[k])*FW-4)+'px',top:(gy+46)+'px',background:bandCol(defs[fi][3],.14)},'<i>'+(k+1)+'</i> '+esc(t)));
+      sf.forEach((f,k)=>hdl('bh sh',{left:(fa+f*FW)+'px',top:(gy+46)+'px',height:'22px'},'',{sub:k}))}
     drawMarkers();drawGroups();
   }
 }
@@ -4567,7 +4601,7 @@ function drawLinks(){
     h+=`<path d="M${x.toFixed(1)} ${p.y.toFixed(1)}V${yb}" stroke="${c}" opacity="${s.on?.7:.25}"/><circle cx="${x.toFixed(1)}" cy="${yb}" r="3" fill="${c}" opacity="${s.on?.9:.3}"/>`});
   linksEl.innerHTML=h;
 }
-function setLinksBtn(){setPayBtn();$('#mkbtn').hidden=view!=='stc';const b=$('#linkbtn');b.hidden=view==='free'||view==='arcs';b.setAttribute('aria-pressed',P.links!==false)}
+function setLinksBtn(){setPayBtn();$('#mkbtn').hidden=view!=='stc';{const zb=$('#zbtn');if(zb)zb.hidden=view!=='stc'}const b=$('#linkbtn');b.hidden=view==='free'||view==='arcs';b.setAttribute('aria-pressed',P.links!==false)}
 
 /* ================= tinta y textos ================= */
 const NS='http://www.w3.org/2000/svg';
@@ -4816,7 +4850,7 @@ board.addEventListener('pointerdown',e=>{
   if(ah){const i=+ah.dataset.act,a=v.acts;
     if(e.target.closest('.ax')){act={k:'delact',i,undo:snapState()};return}
     act={k:'act',i,sx:w.x,orig:a.slice(),alt:e.altKey,grab:e.altKey?null:grabAfter(a[i]),undo:snapState(),moved:false};return}
-  if(sh){const i=+sh.dataset.sub,W=v.edges[6]-v.edges[5];act={k:'sub',i,sx:w.x,W,o:(v.sub&&v.sub.length===4?v.sub:[.2,.4,.6,.8]).slice(),undo:snapState(),moved:false};return}
+  if(sh){const i=+sh.dataset.sub,W=v.edges[14]-v.edges[13];act={k:'sub',i,sx:w.x,W,o:(v.sub&&v.sub.length===4?v.sub:[.2,.4,.6,.8]).slice(),undo:snapState(),moved:false};return}
   if(bh){const i=+bh.dataset.band,E=v.edges,n=E.length-1,solo=e.altKey||i===0||i===n;act={k:'band',i,sx:w.x,orig:E.slice(),alt:solo,grab:solo?null:grabAfter(E[i]),undo:snapState(),moved:false};return}
   {const gt=e.target.closest('.hdl.gt'),mk=e.target.closest('.hdl.mkr');
     if(gt){const id=gt.dataset.grp,gr=grps().find(x=>x.id===id);if(!gr)return;
@@ -5244,7 +5278,7 @@ $$('#zoomui [data-a],#tools [data-a],#paybtn').forEach(b=>b.onclick=()=>{const a
   else if(a==='links'){P.links=P.links===false;setLinksBtn();drawLinks();saveSoon();toast(P.links?'Líneas de unión encendidas':'Líneas de unión apagadas')}
   else if(a==='emoji'){$('#emp').hidden?openEmp():closeEmp()}
   else if(a==='undo')undo();else if(a==='redo')redo();
-  else if(a==='relayout'){const s=snapState(),v=V();v.pos={};if(view==='free')v.acts=null;else v.edges=null;if(v.flagPos)v.flagPos={};autoLayout(view);pushUndo(s);world.classList.add('anim');refreshAll();setTimeout(()=>world.classList.remove('anim'),600);toast('Tarjetas y divisiones acomodadas de nuevo')}});
+  else if(a==='relayout'){const s=snapState(),v=V();v.pos={};if(view==='free')v.acts=null;else v.edges=null;if(v.flagPos)v.flagPos={};v.hid={};autoLayout(view);pushUndo(s);world.classList.add('anim');refreshAll();setTimeout(()=>world.classList.remove('anim'),600);toast('Tarjetas y divisiones acomodadas de nuevo')}});
 function showWelcome(on){closed=on;if(on){clearTimeout(saveT);XSX.home&&XSX.home()}else XSX.homeHide&&XSX.homeHide()}
 async function closeProject(){
   if(closed)return;
@@ -7989,6 +8023,48 @@ const eb=document.createElement('div');eb.id='emptyb';eb.hidden=true;
 eb.innerHTML='<b>Pizarrón en blanco</b><span>Haz doble clic donde quieras una tarjeta, o usa «＋ Tarjeta». Las tarjetas se ordenan de izquierda a derecha y arman el timeline.</span>';
 board.appendChild(eb);
 XSX.emptyHint=()=>{try{eb.hidden=!(P&&P.scenes.length===0&&view!=='arcs'&&XSX.mode==='piz')}catch(_){eb.hidden=true}};
+}
+
+/* ================= XSCRIPT 4.4 · Save the Cat: una sola fila de segmentos por acto, con zonas que se pueden ocultar ================= */
+{
+const stcV4=()=>P.views.stc;
+const hidOf=()=>stcV4().hid||{};
+function bandCards(i){const v=stcV4(),E=v.edges;return P.scenes.filter(s=>{const p=v.pos[s.id];if(!p)return false;const c=p.x+cardW(s)/2;return c>=E[i]&&c<E[i+1]})}
+function setHid(i,hide){
+  const v=stcV4(),E=v.edges;if(!E||E.length!==STC.length+1)return;
+  v.hid=v.hid||{};
+  if(hide){
+    if(v.hid[i])return;
+    if(Object.keys(v.hid).length>=STC.length-1){toast('Deja al menos una zona visible');return}
+    const inner=bandCards(i),run=()=>{
+      const s0=snapState(),w=E[i+1]-E[i],g=grabAfter(E[i+1]);
+      inner.forEach(s=>{const p=v.pos[s.id];p.x=i>0?E[i]-12-cardW(s)/2:E[i]+12-cardW(s)/2});
+      applyShift(g,-w);for(let j=i+1;j<E.length;j++)E[j]-=w;
+      v.hid[i]=Math.max(1,Math.round(w));
+      pushUndo(s0);placeCards();paintBeats();drawBg();drawInk();applyFilters&&applyFilters();zRefresh();
+      toast('«'+bandName('stc',i)+'» oculta; lo demás se recorrió. Vuelve a mostrarla en «Zonas».',3600)};
+    if(inner.length)askSure('«'+bandName('stc',i)+'» tiene '+inner.length+(inner.length===1?' tarjeta':' tarjetas')+'. Se pasan al borde de la zona de al lado.','Ocultar',run);else run();
+  }else{
+    if(!v.hid[i])return;
+    const s0=snapState(),w=v.hid[i],g=grabAfter(E[i]);
+    applyShift(g,w);for(let j=i+1;j<E.length;j++)E[j]+=w;
+    delete v.hid[i];pushUndo(s0);placeCards();paintBeats();drawBg();drawInk();zRefresh()}
+}
+/* ---- ventana «Zonas» ---- */
+const zp=document.createElement('div');zp.id='zpop';zp.hidden=true;board.appendChild(zp);
+function zRefresh(){
+  if(zp.hidden)return;const h=hidOf();let act='',html='<h4>Zonas del Save the Cat</h4><p>Quita las que no vayas a usar: el resto se recorre.</p>';
+  STC.forEach((d,i)=>{if(d[4]!==act){act=d[4];html+='<div class="zact" style="--c:'+bandCol(d[3])+'">'+esc(act)+'</div>'}
+    html+='<label class="zrow"><input type="checkbox" data-z="'+i+'"'+(h[i]?'':' checked')+'><span>'+esc(bandName('stc',i))+'</span><small>'+(d[5]==='m'?'momento':'zona')+'</small></label>'});
+  html+='<button class="btn" data-zall>Mostrar todas</button>';zp.innerHTML=html}
+zp.addEventListener('pointerdown',e=>e.stopPropagation());
+zp.addEventListener('change',e=>{const c=e.target.closest('[data-z]');if(!c)return;const i=+c.dataset.z;if(c.checked)setHid(i,false);else{c.checked=true;setHid(i,true)};setTimeout(zRefresh,50)});
+zp.addEventListener('click',e=>{if(e.target.closest('[data-zall]')){const h=hidOf();Object.keys(h).map(Number).sort((a,b)=>a-b).forEach(i=>setHid(i,false));zRefresh()}});
+{const z=$('#zoomui'),b=document.createElement('button');b.id='zbtn';b.dataset.a='zones';b.title='Elegir qué zonas del Save the Cat usar';b.textContent='Zonas';
+ z.insertBefore(b,$('#mkbtn').nextSibling);b.hidden=view!=='stc';
+ b.addEventListener('click',()=>{zp.hidden=!zp.hidden;if(!zp.hidden){zRefresh()}});
+ document.addEventListener('pointerdown',e=>{if(!zp.hidden&&!e.target.closest('#zpop,#zbtn,#sure'))zp.hidden=true},true)}
+XSX.setHid=setHid;
 }
 
 /* ================= arranque ================= */
