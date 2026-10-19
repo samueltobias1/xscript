@@ -1,0 +1,15 @@
+#tools button[hidden]{display:none!important}
+#tools button.tb2{width:46px;height:auto;padding:6px 0 4px;grid-auto-flow:row;gap:3px;justify-items:center;align-content:center}
+#tools button.tb2 em{font-style:normal;font-size:9px;line-height:1;color:var(--faint)}
+#tools button.tb2[aria-pressed="true"] em{color:var(--fg)}
+#gbar input[type=number]{width:58px;padding:3px 5px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);color:var(--fg);font-size:12px}
+#gbar .gpw{position:relative;display:inline-block}
+#gbar .gpb[aria-pressed="true"]{border-color:var(--accent)}
+#gbar .gpop{position:absolute;bottom:calc(100% + 10px);left:0;display:flex;flex-direction:column;gap:8px;padding:10px 12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);z-index:60;min-width:150px;max-width:260px}
+#gbar .gpop .obs{flex-wrap:wrap;max-width:230px}
+#gbar .gl{font-size:11px;color:var(--faint);letter-spacing:.4px;text-transform:uppercase}
+#gbar .gl2{display:flex;align-items:center;gap:6px;color:var(--mute)}
+#gbar .gcol{display:flex;flex-direction:column;gap:2px}
+#gbar .gcol button{text-align:left;padding:5px 9px;border-radius:7px;font-size:13px;color:var(--fg);background:none;white-space:nowrap}
+#gbar .gcol button:hover{background:var(--panel2)}
+#gbar .gcol button[aria-pressed="true"]{background:var(--panel2);box-shadow:inset 0 0 0 1px var(--accent)}
