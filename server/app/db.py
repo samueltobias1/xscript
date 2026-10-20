@@ -31,6 +31,9 @@ CREATE TABLE IF NOT EXISTS snapshots(
 CREATE TABLE IF NOT EXISTS pdfs(
   project_id TEXT NOT NULL, vid TEXT NOT NULL, key TEXT, size INTEGER, at REAL,
   PRIMARY KEY(project_id, vid));
+CREATE TABLE IF NOT EXISTS ops(
+  project_id TEXT NOT NULL, rev INTEGER NOT NULL, email TEXT, name TEXT, device TEXT, at REAL, ops TEXT,
+  PRIMARY KEY(project_id, rev));
 CREATE INDEX IF NOT EXISTS shares_email ON shares(email);
 """
 

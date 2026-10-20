@@ -6,6 +6,7 @@ con gzip. Los PDFs viven aparte. Cada 10 minutos de cambios queda una copia en e
 
 from __future__ import annotations
 
+import asyncio
 import gzip
 import hashlib
 import html
@@ -14,9 +15,10 @@ import re
 import secrets
 import uuid
 
-from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from fastapi import Depends, FastAPI, HTTPException, Request, Response, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
+from app import ops as xops
 from app import storage
 from app.config import get_settings
 from app.db import conn, now
@@ -31,6 +33,8 @@ SNAP_EVERY = 600
 SNAP_KEEP = 300
 MAX_PROJECT = 80 * 1024 * 1024
 MAX_PDF = 60 * 1024 * 1024
+LOG_KEEP = 4000  # tandas de cambios que se recuerdan para que otros se pongan al día
+DOC_CACHE = 3  # proyectos abiertos en memoria
 ROLES = ("edit", "view")
 ID_RE = re.compile(r"^[A-Za-z0-9_-]{6,64}$")
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -74,8 +78,7 @@ def new_session(resp: Response, email: str, name: str = "", picture: str | None 
     )
 
 
-def user(request: Request) -> dict:
-    tok = request.cookies.get(COOKIE)
+def user_by_token(tok: str | None) -> dict:
     if not tok:
         raise HTTPException(401, "Entra con tu cuenta de Google")
     r = conn().execute(
@@ -88,6 +91,10 @@ def user(request: Request) -> dict:
     if not allowed(r["email"]):
         raise HTTPException(403, "Tu cuenta ya no tiene acceso")
     return {"email": r["email"], "name": r["name"] or r["email"].split("@")[0], "picture": r["picture"]}
+
+
+def user(request: Request) -> dict:
+    return user_by_token(request.cookies.get(COOKIE))
 
 
 def writer(request: Request, u: dict = Depends(user)) -> dict:
@@ -313,6 +320,10 @@ async def save_project(request: Request, pid: str, rev: int, device: str, name: 
         (data, len(data), nrev, now(), u["email"], nm, pid),
     )
     _snapshot(pid, nrev, data, u["email"])
+    # Un guardado completo no trae «cambios»: se anota para que los demás recarguen todo.
+    c.execute("INSERT OR REPLACE INTO ops VALUES(?,?,?,?,?,?,?)", (pid, nrev, u["email"], u["name"], device, now(), None))
+    _DOCS.pop(pid, None)
+    await hub.broadcast(pid, {"type": "reload", "rev": nrev})
     return {"rev": nrev, "name": nm}
 
 
@@ -355,6 +366,198 @@ def trash(u: dict = Depends(user)) -> list[dict]:
         (u["email"], now() - 30 * 86400),
     ).fetchall()
     return [dict(r) for r in rows]
+
+
+# ---------------------------------------------------------------- en vivo (WebSocket)
+class Hub:
+    """Quién tiene abierto cada proyecto, y avisarles al instante de cada cambio."""
+
+    def __init__(self) -> None:
+        self.rooms: dict[str, dict[WebSocket, dict]] = {}
+
+    def online(self, pid: str) -> list[dict]:
+        seen: dict[str, dict] = {}
+        for who in self.rooms.get(pid, {}).values():
+            seen[who["device"]] = {"name": who["name"], "email": who["email"], "device": who["device"]}
+        return sorted(seen.values(), key=lambda x: x["name"].lower())
+
+    async def broadcast(self, pid: str, msg: dict) -> None:
+        room = self.rooms.get(pid)
+        if not room:
+            return
+        data = json.dumps(msg, ensure_ascii=False, separators=(",", ":"))
+        dead = []
+        for ws in list(room):
+            try:
+                await asyncio.wait_for(ws.send_text(data), 10)
+            except Exception:  # noqa: BLE001 - conexión caída: se saca del cuarto
+                dead.append(ws)
+        for ws in dead:
+            room.pop(ws, None)
+
+    async def kick(self, pid: str, email: str) -> None:
+        for ws, who in list((self.rooms.get(pid) or {}).items()):
+            if who["email"] == email:
+                self.rooms[pid].pop(ws, None)
+                try:
+                    await ws.close(code=4404)
+                except Exception:  # noqa: BLE001
+                    pass
+        await self.broadcast(pid, {"type": "presence", "online": self.online(pid)})
+
+
+hub = Hub()
+
+
+@app.websocket("/api/projects/{pid}/ws")
+async def project_ws(ws: WebSocket, pid: str, device: str = "") -> None:
+    # Mismo sitio solamente (evita que otra página abra esta conexión con tu sesión).
+    origin = ws.headers.get("origin")
+    if origin and origin.split("://", 1)[-1] != ws.headers.get("host"):
+        await ws.close(code=4403)
+        return
+    try:
+        u = user_by_token(ws.cookies.get(COOKIE))
+        p, role = role_of(pid, u["email"])
+    except HTTPException:
+        await ws.close(code=4401)
+        return
+    await ws.accept()
+    hub.rooms.setdefault(pid, {})[ws] = {"email": u["email"], "name": u["name"], "device": device[:64] or "?"}
+    try:
+        await ws.send_text(json.dumps({"type": "hello", "rev": p["rev"], "role": role, "online": hub.online(pid)}))
+        await hub.broadcast(pid, {"type": "presence", "online": hub.online(pid)})
+        while True:
+            await ws.receive_text()  # el navegador manda "ping" para mantener la línea viva
+    except WebSocketDisconnect:
+        pass
+    except Exception:  # noqa: BLE001
+        pass
+    finally:
+        room = hub.rooms.get(pid)
+        if room is not None:
+            room.pop(ws, None)
+            if not room:
+                hub.rooms.pop(pid, None)
+        await hub.broadcast(pid, {"type": "presence", "online": hub.online(pid)})
+
+
+# ---------------------------------------------------------------- guardado por partes (cambios)
+_DOCS: dict[str, tuple[int, dict, dict]] = {}  # pid -> (rev, documento abierto, textos originales de cada P)
+
+
+def _open_doc(pid: str, rev: int, data: bytes) -> tuple[dict, dict]:
+    hit = _DOCS.get(pid)
+    if hit and hit[0] == rev:
+        return hit[1], hit[2]
+    doc, orig = xops.load(gzip.decompress(data))
+    _DOCS.pop(pid, None)
+    while len(_DOCS) >= DOC_CACHE:
+        _DOCS.pop(next(iter(_DOCS)))
+    return doc, orig
+
+
+def _batches_since(pid: str, since: int, upto: int, mine: str | None = None) -> dict:
+    """Los cambios de otros después de `since`. reload=True si ya no hay forma de ponerse al día."""
+    rows = conn().execute(
+        "SELECT rev,email,name,device,at,ops FROM ops WHERE project_id=? AND rev>? AND rev<=? ORDER BY rev",
+        (pid, since, upto),
+    ).fetchall()
+    if len(rows) != max(0, upto - since):
+        return {"reload": True, "batches": []}
+    out = []
+    for r in rows:
+        if r["ops"] is None:
+            return {"reload": True, "batches": []}
+        out.append({"rev": r["rev"], "by": {"email": r["email"], "name": r["name"]}, "device": r["device"],
+                    "at": r["at"], "ops": json.loads(r["ops"])})
+    return {"reload": False, "batches": out}
+
+
+@app.post("/api/projects/{pid}/ops")
+async def post_ops(request: Request, pid: str, rev: int, device: str, u: dict = Depends(writer)) -> dict:
+    p, role = role_of(pid, u["email"])
+    if role == "view":
+        raise HTTPException(403, "Solo tienes permiso de lectura")
+    raw = await _body(request, MAX_PROJECT)
+    try:
+        body = json.loads(gzip.decompress(raw) if request.headers.get("x-gz") == "1" else raw)
+        raw_ops = body["ops"]
+        assert isinstance(raw_ops, list)
+    except (OSError, ValueError, KeyError, AssertionError) as e:
+        raise HTTPException(400, "Los cambios llegaron dañados") from e
+    if len(raw_ops) > xops.MAX_OPS_PER_BATCH:
+        raise HTTPException(413, "Demasiados cambios juntos")
+    c = conn()
+    c.execute("BEGIN IMMEDIATE")
+    try:
+        row = c.execute("SELECT rev,data FROM projects WHERE id=? AND deleted IS NULL", (pid,)).fetchone()
+        if not row:
+            raise HTTPException(404, "No existe ese proyecto")
+        cur = row["rev"]
+        doc, orig = _open_doc(pid, cur, row["data"])
+        applied: list[dict] = []
+        rejected: list[dict] = []
+        touched: set[str] = set()
+        try:
+            for i, r in enumerate(raw_ops):
+                try:
+                    op = xops.normalize_op(r)
+                    xops.apply(doc, op)
+                except xops.OpError as e:
+                    rejected.append({"i": i, "reason": str(e)})
+                    continue
+                applied.append(op)
+                v = xops.version_of(op["p"])
+                if v:
+                    touched.add(v)
+        except BaseException:
+            _DOCS.pop(pid, None)
+            raise
+        if not applied:
+            c.execute("ROLLBACK")
+            since = _batches_since(pid, min(rev, cur), cur)
+            return {"rev": cur, "since": since["batches"], "reload": since["reload"], "rejected": rejected, "applied": 0}
+        data = gzip.compress(xops.dump(doc, orig, touched), 1)
+        nrev = cur + 1
+        t = now()
+        c.execute(
+            "UPDATE projects SET data=?,size=?,rev=?,updated=?,updated_by=? WHERE id=?",
+            (data, len(data), nrev, t, u["email"], pid),
+        )
+        c.execute(
+            "INSERT INTO ops VALUES(?,?,?,?,?,?,?)",
+            (pid, nrev, u["email"], u["name"], device, t, json.dumps(applied, ensure_ascii=False, separators=(",", ":"))),
+        )
+        c.execute("DELETE FROM ops WHERE project_id=? AND rev<=?", (pid, nrev - LOG_KEEP))
+        c.execute("COMMIT")
+    except BaseException:
+        if c.in_transaction:
+            c.execute("ROLLBACK")
+        _DOCS.pop(pid, None)
+        raise
+    # el documento en memoria ya trae los cambios nuevos: se queda como el vigente
+    for v in doc.get("project", {}).get("versions", []):
+        k = xops.key_of(v)
+        if k in touched and isinstance(v.get("P"), dict):
+            orig.pop(k, None)
+    _DOCS[pid] = (nrev, doc, orig)
+    _snapshot(pid, nrev, data, u["email"])
+    since = _batches_since(pid, min(rev, cur), cur)
+    batch = {"rev": nrev, "by": {"email": u["email"], "name": u["name"]}, "device": device, "at": t, "ops": applied}
+    await hub.broadcast(pid, {"type": "ops", "batch": batch})
+    return {"rev": nrev, "since": since["batches"], "reload": since["reload"], "rejected": rejected, "applied": len(applied),
+            "batch": batch}
+
+
+@app.get("/api/projects/{pid}/ops")
+def get_ops(pid: str, since: int, u: dict = Depends(user)) -> dict:
+    p, role = role_of(pid, u["email"])
+    cur = p["rev"]
+    if since > cur:
+        return {"rev": cur, "name": p["name"], "batches": [], "reload": True}
+    r = _batches_since(pid, since, cur)
+    return {"rev": cur, "name": p["name"], **r}
 
 
 # ---------------------------------------------------------------- turno de edición
@@ -453,13 +656,14 @@ async def add_share(request: Request, pid: str, u: dict = Depends(writer)) -> di
 
 
 @app.delete("/api/projects/{pid}/shares/{email}")
-def del_share(pid: str, email: str, u: dict = Depends(writer)) -> dict:
+async def del_share(pid: str, email: str, u: dict = Depends(writer)) -> dict:
     p, role = role_of(pid, u["email"])
     if role != "owner" and email.lower() != u["email"]:
         raise HTTPException(403, "Solo el dueño puede quitar permisos")
     c = conn()
     c.execute("DELETE FROM shares WHERE project_id=? AND email=?", (pid, email.lower()))
     c.execute("DELETE FROM locks WHERE project_id=? AND email=?", (pid, email.lower()))
+    await hub.kick(pid, email.lower())
     return {"ok": True}
 
 
