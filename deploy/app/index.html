@@ -1055,6 +1055,12 @@ html.xs-child.xs-ro .card{pointer-events:none}
 #xsmid.split #app .rastro .tr,html.xs-child .rastro .tr{left:0!important;top:3px!important;height:8px!important}
 html.xs-child #tools{display:none!important}
 #zoomui #homebtn{display:inline-flex;align-items:center}
+/* ===== 5.4 · invitados ===== */
+.agr{display:grid;grid-template-columns:1fr auto;gap:6px 10px;padding:9px 0;border-top:1px solid var(--line,#2a2a2a)}
+.agm small{display:block;color:var(--faint);font-size:12px}.agm i{color:var(--mute);font-style:normal;font-size:12px;margin-left:6px}
+.aga{display:flex;gap:6px;align-items:center}.agfx{font-size:11px;color:var(--faint);border:1px solid var(--line,#2a2a2a);border-radius:10px;padding:1px 8px}
+.agp{grid-column:1/-1}.agpr{display:flex;align-items:center;gap:10px;padding:5px 0 5px 12px}.agpr b{flex:1;font-weight:500}.agpr small{color:var(--faint);font-size:12px}
+#agE{flex:1.4}#agN{flex:1}
 </style>
 </head>
 <body>
@@ -1095,7 +1101,7 @@ html.xs-child #tools{display:none!important}
     </div>
   </div>
   <div id="mainmenu" hidden role="menu">
-    <div class="mh">Pizarrón · XSCRIPT 5.3</div>
+    <div class="mh">Pizarrón · XSCRIPT 5.4</div>
     <button data-act="sumexp" role="menuitem"><b>Exportar para resumir</b><small>Baja el texto de las escenas para que Claude escriba títulos y resúmenes</small></button>
     <button data-act="sumimp" role="menuitem"><b>Importar resúmenes</b><small>Pone en las tarjetas los títulos y resúmenes que te regrese Claude</small></button>
     <button data-act="close" role="menuitem"><b>Ir al inicio</b><small>Lo guarda y vuelve a los proyectos recientes</small></button>
@@ -7709,7 +7715,7 @@ XSX.home=async()=>{
   const row=p=>`<div class="pcr" data-p="${p.id}" tabindex="0"><div class="pcm"><b>${esc(p.name)}</b><small>${fdate3(p.updated*1000)}${p.updated_by&&p.updated_by!==CL.user.email?' · '+esc(p.updated_by.split('@')[0]):''}${p.role!=='owner'?' · de '+esc(p.owner.split('@')[0]):''}</small></div>
     ${p.lock?`<span class="pclk" title="${esc(p.lock.email)}">● ${esc((p.lock.name||p.lock.email).split(' ')[0])} editando</span>`:''}${p.shares?`<span class="pcsh" title="Compartido">👥 ${p.shares}</span>`:''}${p.role!=='owner'?`<span class="pcrole">${p.role==='edit'?'Puede editar':'Solo lectura'}</span>`:''}
     <button class="pm" data-pm="${p.id}" aria-label="Más opciones">⋯</button></div>`;
-  el.innerHTML=`<div class="hw"><div class="hhead"><h1 class="slug"><span class="sn">1</span><span>INT. <em>XSCRIPT</em> - DÍA</span><span class="sn">1</span></h1><span class="sp"></span><span class="huser">${CL.user.picture?`<img src="${esc(CL.user.picture)}" alt="" referrerpolicy="no-referrer">`:''}${esc(CL.user.name)}</span></div>
+  el.innerHTML=`<div class="hw"><div class="hhead"><h1 class="slug"><span class="sn">1</span><span>INT. <em>XSCRIPT</em> - DÍA</span><span class="sn">1</span></h1><span class="sp"></span>${CL.user.owner?'<button class="btn" data-h="adm">Invitados</button>':''}<span class="huser">${CL.user.picture?`<img src="${esc(CL.user.picture)}" alt="" referrerpolicy="no-referrer">`:''}${esc(CL.user.name)}</span></div>
   ${recov?`<div class="hnote"><span>Quedaron cambios sin subir de <b>${esc(w.name)}</b> (${sinceStr(w.at)}).</span><button class="btn" data-h="discard">Descartar</button><button class="btn pri" data-h="recover">Subirlos</button></div>`:''}
   <div class="hb"><button class="btn pri" data-h="new">Nuevo proyecto (PDF del guion)</button><button class="btn" data-h="blank">Proyecto en blanco</button><button class="btn" data-h="up">Subir un .json</button></div>
   <h3>Mis proyectos</h3>${mine.length?`<div class="rlist">${mine.map(row).join('')}</div>`:'<div class="hempty">Aún no tienes proyectos. Crea uno con el PDF de tu guion, empieza uno en blanco, o sube el .json de un proyecto que ya tengas.</div>'}
@@ -7722,6 +7728,7 @@ $('#home').addEventListener('click',async e=>{
   const h=e.target.closest('[data-h],[data-p],[data-pm],[data-rs]');if(!h)return;
   e.stopImmediatePropagation();e.preventDefault();
   const a=h.dataset.h;
+  if(a==='adm'){XSX.adminDlg();return}
   if(a==='login'){location.href='/api/auth/login?next='+encodeURIComponent(location.pathname+location.search);return}
   if(a==='new'){pendingPdf='new';$('#xsPdf').click();return}
   if(a==='up'){$('#xsJson').click();return}
@@ -8396,7 +8403,7 @@ scrubTo=function(p){
   const t=T();t.x=board.clientWidth/2-cx*t.z;applyT()};
 
 /* ================= 5.1 · pizarrón en blanco dentro del proyecto, versión de la app visible, barra movible ================= */
-const XS_APPV='5.3';
+const XS_APPV='5.4';
 
 /* ---- A. ＋ Pizarrón en blanco (nueva versión sin PDF) ---- */
 async function addBlankVersion(){
@@ -9059,6 +9066,36 @@ if(CHILD){
   document.addEventListener('keyup',()=>setTimeout(()=>say('busy',document.activeElement&&document.activeElement.isContentEditable?1:0),600),true)}
 /* ganchos para pruebas */
 window.__x53={SPL,get P(){return P},get curV(){return curV},get view(){return view},get tool(){return tool},get inkColor(){return inkColor},verById:id=>verById(id),cmpRefresh:()=>cmpRefresh(),paintCard:s=>paintCard(s),saveSoon:()=>saveSoon(),setTool:t=>setTool(t),stcV:()=>stcV(),drawBg:()=>drawBg(),snapState:()=>snapState(),pushUndo:s=>pushUndo(s),drawInk:()=>drawInk(),setSel:(c,i)=>setSel(c,i),uid:()=>uid(),T:()=>T()};
+
+/* ================= 5.4 · Invitados (modo Dios del dueño) ================= */
+(function(){
+  const fb=b=>b>=1e9?(b/1e9).toFixed(1)+' GB':b>=1e6?(b/1e6).toFixed(1)+' MB':Math.max(1,Math.round(b/1e3))+' KB';
+  async function adminDlg(){
+    const load=async()=>{const r=await fetch('/api/admin/guests',{credentials:'same-origin',cache:'no-store'});return r.ok?r.json():{guests:[],total_projects:0,total_bytes:0}};
+    let D=await load();
+    const render=d=>{
+      d.querySelector('.agl').innerHTML=D.guests.length?D.guests.map(g=>`<div class="agr" data-e="${esc(g.email)}"><div class="agm"><b>${esc(g.name||g.email)}</b>${g.note?` <i>${esc(g.note)}</i>`:''}<small>${esc(g.email)} · ${g.last_login?'entró '+fdate2(g.last_login*1000):'aún no entra'}</small><small>${g.projects} proyecto${g.projects===1?'':'s'} · ${fb(g.bytes)}${g.last_update?' · cambió '+fdate2(g.last_update*1000):''}</small></div>
+        <div class="aga">${g.projects?`<button class="btn" data-av="${esc(g.email)}">Ver proyectos</button>`:''}${g.fixed?'<span class="agfx" title="Está en el archivo .env del servidor">fijo</span>':`<button class="btn dng" data-x="${esc(g.email)}" title="Quitar acceso">✕</button>`}</div><div class="agp"></div></div>`).join(''):'<div class="hempty">Aún no hay invitados.</div>';
+      d.querySelector('.agt').textContent=`Total en el servidor: ${D.total_projects} proyectos · ${fb(D.total_bytes)}`};
+    xdlg({title:'Invitados a probar XSCRIPT',html:`<p style="color:var(--mute);font-size:13px;margin:0 0 10px">Un invitado entra con su cuenta de Google, crea sus propios proyectos y solo ve lo suyo. Tú puedes mirar sus proyectos (solo lectura).</p>
+      <div class="shadd"><input type="email" id="agE" placeholder="correo de Google" autocomplete="off"><input type="text" id="agN" placeholder="nota (ej. Productor)" maxlength="60" autocomplete="off"><button class="btn pri" id="agA">Invitar</button></div>
+      <p style="color:var(--faint);font-size:12px;margin:6px 0 12px">Mándale el link <b>${esc(location.origin)}</b>.</p><div class="agl"></div><p class="agt" style="color:var(--faint);font-size:12px;margin:12px 0 0"></p>`,
+      init:d=>{render(d);
+        const add=async()=>{const e=d.querySelector('#agE').value.trim(),n=d.querySelector('#agN').value.trim();if(!e)return;
+          const x=await API('/api/admin/guests',{method:'POST',body:JSON.stringify({email:e,note:n}),headers:{'Content-Type':'application/json'}});
+          if(!x.ok){toast(await errMsg(x),3500);return}d.querySelector('#agE').value='';d.querySelector('#agN').value='';D=await load();render(d);toast('Invitado: '+e,2500)};
+        d.querySelector('#agA').onclick=add;d.querySelectorAll('#agE,#agN').forEach(i=>i.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter')add()});
+        d.querySelector('.agl').addEventListener('click',async e=>{
+          const x=e.target.closest('[data-x]'),v=e.target.closest("[data-av]");
+          if(x){const em=x.dataset.x;askSure('¿Quitar el acceso de '+em+'? Sus proyectos se conservan en el servidor.','Quitar',async()=>{await API('/api/admin/guests/'+encodeURIComponent(em),{method:'DELETE'});D=await load();render(d)});return}
+          if(v){const row=v.closest('.agr'),box=row.querySelector('.agp');
+            if(box.innerHTML){box.innerHTML='';return}
+            const r=await fetch('/api/admin/projects?owner='+encodeURIComponent(v.dataset.av),{credentials:'same-origin'});const L=r.ok?await r.json():[];
+            box.innerHTML=L.map(p=>`<div class="agpr"><b>${esc(p.name)}</b><small>${fdate2(p.updated*1000)} · ${fb(p.size)}</small><button class="btn" data-ao="${p.id}">Abrir (solo lectura)</button></div>`).join('');return}
+          const o=e.target.closest('[data-ao]');if(o){closeDlg();openCloud(o.dataset.ao)}})},
+      buttons:[{label:'Listo',pri:true}]})}
+  XSX.adminDlg=adminDlg;
+})();
 
 /* ================= arranque ================= */
 XSX.boot();

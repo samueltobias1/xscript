@@ -97,3 +97,30 @@ def test_sin_sesion(client):
     c = TestClient(client)
     assert c.get("/api/me").status_code == 401
     assert c.get("/api/projects").status_code == 401
+
+
+def test_panel_invitados(client):
+    sam = login(client, "sam@x.com")
+    prod = TestClient(client)
+    assert prod.get("/api/auth/dev", params={"email": "prod@x.com"}).status_code == 403
+    assert sam.post("/api/admin/guests", json={"email": "prod@x.com", "note": "Productor"}, headers=H).json()["ok"]
+    prod = login(client, "prod@x.com")
+    # el invitado no es dueño del servidor: no ve ni toca el panel
+    assert prod.get("/api/admin/guests").status_code == 403
+    assert prod.post("/api/admin/guests", json={"email": "z@x.com"}, headers=H).status_code == 403
+    r = prod.post("/api/projects", params={"name": "Juego"}, content=gzip.compress(bundle()), headers={**H, "x-gz": "1"})
+    assert r.status_code == 200, r.text
+    pid = r.json()["id"]
+    # solo ve lo suyo
+    assert [p["id"] for p in prod.get("/api/projects").json()] == [pid]
+    assert sam.get("/api/projects").json() == []
+    # modo Dios: Sam lo mira, pero solo lectura
+    g = sam.get("/api/admin/guests").json()
+    assert g["guests"][0]["email"] == "prod@x.com" and g["guests"][0]["projects"] == 1
+    assert [p["id"] for p in sam.get("/api/admin/projects", params={"owner": "prod@x.com"}).json()] == [pid]
+    assert sam.get(f"/api/projects/{pid}").status_code == 200
+    assert sam.put(f"/api/projects/{pid}", params={"rev": 1, "device": "s"}, content=bundle(), headers=H).status_code == 403
+    # quitarlo: pierde acceso al instante, sus proyectos se conservan
+    assert sam.delete("/api/admin/guests/prod@x.com", headers=H).json()["ok"]
+    assert prod.get("/api/projects").status_code in (401, 403)
+    assert sam.get("/api/admin/projects", params={"owner": "prod@x.com"}).json()[0]["id"] == pid

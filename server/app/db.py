@@ -34,6 +34,8 @@ CREATE TABLE IF NOT EXISTS pdfs(
 CREATE TABLE IF NOT EXISTS ops(
   project_id TEXT NOT NULL, rev INTEGER NOT NULL, email TEXT, name TEXT, device TEXT, at REAL, ops TEXT,
   PRIMARY KEY(project_id, rev));
+CREATE TABLE IF NOT EXISTS guests(
+  email TEXT PRIMARY KEY, note TEXT, created REAL, created_by TEXT);
 CREATE INDEX IF NOT EXISTS shares_email ON shares(email);
 """
 

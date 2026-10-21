@@ -60,6 +60,8 @@ def allowed(email: str) -> bool:
     s = get_settings()
     if email in s.owner_emails or email in s.guest_emails:
         return True
+    if conn().execute("SELECT 1 FROM guests WHERE email=?", (email,)).fetchone():
+        return True
     return conn().execute("SELECT 1 FROM shares WHERE email=? LIMIT 1", (email,)).fetchone() is not None
 
 
@@ -115,6 +117,8 @@ def role_of(pid: str, email: str) -> tuple[dict, str]:
         return dict(p), "owner"
     s = c.execute("SELECT role FROM shares WHERE project_id=? AND email=?", (pid, email)).fetchone()
     if not s:
+        if email in get_settings().owner_emails:  # modo Dios: el dueño del servidor puede mirar (solo lectura)
+            return dict(p), "view"
         raise HTTPException(404, "No existe ese proyecto")
     return dict(p), s["role"]
 
@@ -131,6 +135,69 @@ def lock_info(pid: str) -> dict | None:
 def health() -> dict:
     conn().execute("SELECT 1")
     return {"ok": True, "app": "xscript"}
+
+
+def admin(u: dict = Depends(writer)) -> dict:
+    if u["email"] not in get_settings().owner_emails:
+        raise HTTPException(403, "Solo el dueño del servidor")
+    return u
+
+
+@app.get("/api/admin/guests")
+def admin_guests(request: Request, u: dict = Depends(user)) -> dict:
+    if u["email"] not in get_settings().owner_emails:
+        raise HTTPException(403, "Solo el dueño del servidor")
+    c, st = conn(), get_settings()
+    emails = {r["email"]: {"note": r["note"], "created": r["created"], "fixed": False}
+              for r in c.execute("SELECT email,note,created FROM guests")}
+    for e in st.guest_emails:
+        emails.setdefault(e, {"note": "", "created": None, "fixed": True})
+    out = []
+    for e, g in emails.items():
+        pr = c.execute("SELECT COUNT(*) n, COALESCE(SUM(size),0) b, MAX(updated) last FROM projects "
+                       "WHERE owner=? AND deleted IS NULL", (e,)).fetchone()
+        pd = c.execute("SELECT COALESCE(SUM(f.size),0) FROM pdfs f JOIN projects p ON p.id=f.project_id "
+                       "WHERE p.owner=? AND p.deleted IS NULL", (e,)).fetchone()[0]
+        us = c.execute("SELECT name,last_login FROM users WHERE email=?", (e,)).fetchone()
+        out.append({"email": e, **g, "name": us["name"] if us else None,
+                    "last_login": us["last_login"] if us else None,
+                    "projects": pr["n"], "bytes": pr["b"] + pd, "last_update": pr["last"]})
+    out.sort(key=lambda x: -(x["last_login"] or x["created"] or 0))
+    tot = c.execute("SELECT COUNT(*) n, COALESCE(SUM(size),0) b FROM projects WHERE deleted IS NULL").fetchone()
+    return {"guests": out, "total_projects": tot["n"], "total_bytes": tot["b"]}
+
+
+@app.post("/api/admin/guests")
+async def admin_add_guest(request: Request, u: dict = Depends(admin)) -> dict:
+    body = await request.json()
+    email = str(body.get("email", "")).strip().lower()
+    if not EMAIL_RE.match(email):
+        raise HTTPException(400, "Revisa el correo")
+    conn().execute(
+        "INSERT INTO guests VALUES(?,?,?,?) ON CONFLICT(email) DO UPDATE SET note=excluded.note",
+        (email, str(body.get("note", ""))[:120], now(), u["email"]),
+    )
+    return {"ok": True}
+
+
+@app.delete("/api/admin/guests/{email}")
+async def admin_del_guest(email: str, u: dict = Depends(admin)) -> dict:
+    email = email.strip().lower()
+    c = conn()
+    c.execute("DELETE FROM guests WHERE email=?", (email,))
+    c.execute("DELETE FROM sessions WHERE email=?", (email,))
+    c.execute("DELETE FROM locks WHERE email=?", (email,))
+    return {"ok": True}
+
+
+@app.get("/api/admin/projects")
+def admin_projects(owner: str, u: dict = Depends(user)) -> list[dict]:
+    if u["email"] not in get_settings().owner_emails:
+        raise HTTPException(403, "Solo el dueño del servidor")
+    rows = conn().execute(
+        "SELECT id,name,owner,updated,updated_by,size,rev FROM projects WHERE owner=? AND deleted IS NULL "
+        "ORDER BY updated DESC", (owner.strip().lower(),)).fetchall()
+    return [dict(r) for r in rows]
 
 
 @app.get("/api/me")

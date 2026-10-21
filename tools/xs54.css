@@ -1,0 +1,6 @@
+/* ===== 5.4 · invitados ===== */
+.agr{display:grid;grid-template-columns:1fr auto;gap:6px 10px;padding:9px 0;border-top:1px solid var(--line,#2a2a2a)}
+.agm small{display:block;color:var(--faint);font-size:12px}.agm i{color:var(--mute);font-style:normal;font-size:12px;margin-left:6px}
+.aga{display:flex;gap:6px;align-items:center}.agfx{font-size:11px;color:var(--faint);border:1px solid var(--line,#2a2a2a);border-radius:10px;padding:1px 8px}
+.agp{grid-column:1/-1}.agpr{display:flex;align-items:center;gap:10px;padding:5px 0 5px 12px}.agpr b{flex:1;font-weight:500}.agpr small{color:var(--faint);font-size:12px}
+#agE{flex:1.4}#agN{flex:1}
