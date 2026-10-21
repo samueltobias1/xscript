@@ -17,6 +17,7 @@ class Settings:
     public_host: str = "localhost"
     data_dir: str = "/data"
     owner_emails: list[str] = field(default_factory=list)
+    guest_emails: list[str] = field(default_factory=list)
     google_client_id: str = ""
     google_client_secret: str = ""
     s3_bucket: str = ""
@@ -52,6 +53,7 @@ def get_settings() -> Settings:
         public_host=e("XS_PUBLIC_HOST", "localhost"),
         data_dir=e("XS_DATA_DIR", "/data"),
         owner_emails=_list(e("XS_OWNER_EMAILS", "")),
+        guest_emails=_list(e("XS_GUEST_EMAILS", "")),
         google_client_id=e("XS_GOOGLE_CLIENT_ID", ""),
         google_client_secret=e("XS_GOOGLE_CLIENT_SECRET", ""),
         s3_bucket=e("XS_S3_BUCKET", ""),

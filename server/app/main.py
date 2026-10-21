@@ -58,7 +58,7 @@ def page(title: str, msg: str, code: int = 200) -> HTMLResponse:
 # ---------------------------------------------------------------- sesión
 def allowed(email: str) -> bool:
     s = get_settings()
-    if email in s.owner_emails:
+    if email in s.owner_emails or email in s.guest_emails:
         return True
     return conn().execute("SELECT 1 FROM shares WHERE email=? LIMIT 1", (email,)).fetchone() is not None
 
